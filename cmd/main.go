@@ -1,6 +1,7 @@
 package main
 
 import (
+	"calc/internal/content"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/canvas"
@@ -13,7 +14,7 @@ const KuteGoAPIURL = "https://kutego-api-xxxxx-ew.a.run.app"
 func main() {
 	a := app.New()
 	w := a.NewWindow("Smart Calculator (c) acristin")
-
+	content.SetContent(&w, &a)
 	w.SetContent(widget.NewLabel("Hello World!"))
 	fileMenu := fyne.NewMenu("File",
 		fyne.NewMenuItem("Quit", func() { a.Quit() }),
