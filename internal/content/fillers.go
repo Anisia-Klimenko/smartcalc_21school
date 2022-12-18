@@ -111,13 +111,14 @@ func (c *Calc) LoadUI(a fyne.App) {
 	canvas.AddShortcut(&fyne.ShortcutPaste{}, c.onPasteShortcut)
 
 	// add menu
-	fileMenu := fyne.NewMenu("File",
+	fileMenu := fyne.NewMenu("Calculator Menu",
 		fyne.NewMenuItem("Quit", func() { a.Quit() }),
 	)
 	mainMenu := fyne.NewMainMenu(
 		fileMenu,
 		//helpMenu,
 	)
+	c.Window.SetMainMenu(mainMenu)
 
 	// handle ESC
 	c.Window.Canvas().SetOnTypedKey(func(keyEvent *fyne.KeyEvent) {
@@ -125,7 +126,6 @@ func (c *Calc) LoadUI(a fyne.App) {
 			a.Quit()
 		}
 	})
-	c.Window.SetMainMenu(mainMenu)
 	c.Window.Resize(fyne.NewSize(500, 300))
 	c.Window.Show()
 
