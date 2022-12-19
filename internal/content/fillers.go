@@ -57,8 +57,13 @@ func (c *Calc) charButton(char rune) *widget.Button {
 }
 
 func (c *Calc) stringButton(s string) *widget.Button {
+	if s == "mod" {
+		return c.addButton(s, func() {
+			c.string(s)
+		})
+	}
 	return c.addButton(s, func() {
-		c.string(s)
+		c.string(s + "(")
 	})
 }
 
@@ -72,37 +77,47 @@ func (c *Calc) LoadUI(a fyne.App) {
 	c.Window = a.NewWindow("Smart Calculator (c) acristin")
 	c.Window.SetContent(container.NewGridWithColumns(1,
 		c.Output,
-		container.NewGridWithColumns(5,
+		container.NewGridWithColumns(7,
 			c.addButton("C", c.clear),
 			c.charButton('('),
 			c.charButton(')'),
 			c.charButton('/'),
-			c.charButton('^')),
-		container.NewGridWithColumns(5,
+			c.charButton('^'),
+			c.stringButton("sin"),
+			c.stringButton("asin")),
+		container.NewGridWithColumns(7,
 			c.digitButton(7),
 			c.digitButton(8),
 			c.digitButton(9),
 			c.charButton('*'),
-			c.stringButton("mod")),
-		container.NewGridWithColumns(5,
+			c.stringButton("mod"),
+			c.stringButton("cos"),
+			c.stringButton("acos")),
+		container.NewGridWithColumns(7,
 			c.digitButton(4),
 			c.digitButton(5),
 			c.digitButton(6),
 			c.charButton('-'),
-			c.stringButton("--")),
-		container.NewGridWithColumns(5,
+			c.stringButton("--"),
+			c.stringButton("tan"),
+			c.stringButton("atan")),
+		container.NewGridWithColumns(7,
 			c.digitButton(1),
 			c.digitButton(2),
 			c.digitButton(3),
 			c.charButton('+'),
-			c.stringButton("++")),
-		container.NewGridWithColumns(5,
+			c.stringButton("++"),
+			c.stringButton("ln"),
+			c.stringButton("log")),
+		container.NewGridWithColumns(7,
+			//container.NewGridWithColumns(4,
 			c.digitButton(0),
 			c.charButton('.'),
 			c.stringButton("sqrt"),
 			c.charButton('x'),
-			equals)),
-	)
+			//container.NewGridWithColumns(1,
+			equals),
+	))
 
 	canvas := c.Window.Canvas()
 	canvas.SetOnTypedRune(c.onTypedRune)
