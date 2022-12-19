@@ -17,19 +17,22 @@ var functions = []string{
 func Calculate(input string) (result string) {
 	output := infixToPostfix(input)
 	fmt.Println(output)
-	for _, s := range output {
-		result += s
+	res, err := evaluatePostfix(output)
+	if err != nil {
+		result = "error"
+	} else {
+		result = fmt.Sprint(res)
 	}
 	return
 }
 
 // Function to return precedence of operators
 func precedence(s string) int {
-	if (s == "^") || (s == "sqrt") || (s == "sin") || (s == "asin") || (s == "cos") || (s == "acos") || (s == "tan") || (s == "atan") || (s == "ln") || (s == "log") {
+	if s == "^" || isFunction(s) {
 		return 3
-	} else if (s == "/") || (s == "*") || (s == "mod") {
+	} else if s == "/" || s == "*" || s == "mod" {
 		return 2
-	} else if (s == "++") || (s == "--") || (s == "+") || (s == "-") {
+	} else if s == "++" || s == "--" || s == "+" || s == "-" {
 		return 1
 	} else {
 		return -1
@@ -60,41 +63,6 @@ func isDigit(input string) bool {
 		return false
 	}
 	return true
-}
-
-func evaluatePostfix(exp string) (string, error) {
-	operands := new(Stack)
-	//chars := strings.Split(exp, " ")
-	for ind, _ := range exp {
-		if !isOperator(exp[ind:]) {
-			//op, err := strconv.ParseFloat(char, 64)
-			//if err != nil {
-			//	return 0.0, err
-			//}
-			//		operands.Push(op)
-		} else {
-			//		operand2, err := operands.Top()
-			//		if err != nil {
-			//			return 0.0, err
-			//		}
-			//		operands.Pop()
-			//		operand1, err := operands.Top()
-			//		if err != nil {
-			//			return 0.0, err
-		}
-		//		operands.Pop()
-		//		calculated, err := calculate(char, operand1, operand2)
-		//		if err != nil {
-		//			return 0.0, err
-		//		}
-		//		operands.Push(calculated)
-		//	}
-	}
-	result := operands.Top()
-	//if err != nil {
-	//	return 0.0, err
-	//}
-	return result, nil
 }
 
 // infixToPostfix convert infix notation to postfix
@@ -138,38 +106,6 @@ func infixToPostfix(infix string) (postfix Stack) {
 	return
 }
 
-func infixToPostfix1(infix string) string {
-	var sta Stack
-	var postfix string
-
-	for _, char := range infix {
-		opchar := string(char)
-		// if scanned character is operand, add it to output string
-		if (char >= 'a' && char <= 'z') || (char >= 'A' && char <= 'Z') || (char >= '0' && char <= '9') {
-			postfix = postfix + opchar
-		} else if char == '(' {
-			sta.Push(opchar)
-		} else if char == ')' {
-			for sta.Top() != "(" {
-				postfix = postfix + sta.Top()
-				sta.Pop()
-			}
-			sta.Pop()
-		} else {
-			for !sta.IsEmpty() && precedence(opchar) <= precedence(sta.Top()) {
-				postfix = postfix + sta.Top()
-				sta.Pop()
-			}
-			sta.Push(opchar)
-		}
-	}
-	// Pop all the remaining elements from the stack
-	for !sta.IsEmpty() {
-		postfix = postfix + sta.Top()
-		sta.Pop()
-	}
-	return postfix
-}
 func splitLex(input string) (res Stack) {
 	var digit string
 	var ind = 0
@@ -206,6 +142,5 @@ func splitLex(input string) (res Stack) {
 			}
 		}
 	}
-	//log.Println(res)
 	return
 }
