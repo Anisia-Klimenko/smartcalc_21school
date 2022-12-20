@@ -6,11 +6,10 @@ import (
 	"strconv"
 )
 
-func evaluatePostfix(exp Stack) (float64, error) {
+func evaluatePostfix(exp Stack, xVal float64) (float64, error) {
 	operands := new(StackFloat)
 	var calculated float64
 	var err error
-	//chars := strings.Split(exp, " ")
 	for _, elem := range exp {
 		if isDigit(elem) {
 			op, err := strconv.ParseFloat(elem, 64)
@@ -18,6 +17,8 @@ func evaluatePostfix(exp Stack) (float64, error) {
 				return 0.0, err
 			}
 			operands.Push(op)
+		} else if elem == "x" {
+			operands.Push(xVal)
 		} else {
 			if isFunction(elem) {
 				operand := operands.Top()

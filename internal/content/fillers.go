@@ -4,12 +4,12 @@ import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
-	"log"
 	"strconv"
 )
 
 type Calc struct {
 	Equation string
+	XValue   float64
 	Output   *widget.Label
 	Buttons  map[string]*widget.Button
 	Window   fyne.Window
@@ -69,11 +69,21 @@ func (c *Calc) stringButton(s string) *widget.Button {
 }
 
 func (c *Calc) LoadUI(a fyne.App) {
+	var err error
 	c.Output = &widget.Label{Alignment: fyne.TextAlignTrailing}
 	c.Output.TextStyle.Monospace = true
 
 	equals := c.addButton("=", c.evaluate)
 	equals.Importance = widget.HighImportance
+
+	xEntry := widget.NewEntry()
+	xEntry.TextStyle.Monospace = true
+	xEntry.OnChanged = func(s string) {
+		c.XValue, err = strconv.ParseFloat(s, 64)
+		if err != nil {
+			c.display("error")
+		}
+	}
 
 	c.Window = a.NewWindow("Smart Calculator (c) acristin")
 	c.Window.SetContent(container.NewGridWithColumns(1,
@@ -83,41 +93,43 @@ func (c *Calc) LoadUI(a fyne.App) {
 			c.charButton('('),
 			c.charButton(')'),
 			c.charButton('/'),
-			c.charButton('^'),
-			c.stringButton("sin"),
-			c.stringButton("asin")),
+			c.charButton('x'),
+			widget.NewLabelWithStyle("x = ", fyne.TextAlignTrailing, fyne.TextStyle{Monospace: true}),
+			xEntry),
 		container.NewGridWithColumns(7,
 			c.digitButton(7),
 			c.digitButton(8),
 			c.digitButton(9),
 			c.charButton('*'),
 			c.stringButton("mod"),
-			c.stringButton("cos"),
-			c.stringButton("acos")),
+			c.stringButton("sin"),
+			c.stringButton("asin")),
 		container.NewGridWithColumns(7,
 			c.digitButton(4),
 			c.digitButton(5),
 			c.digitButton(6),
 			c.charButton('-'),
 			c.stringButton("--"),
-			c.stringButton("tan"),
-			c.stringButton("atan")),
+			c.stringButton("cos"),
+			c.stringButton("acos")),
 		container.NewGridWithColumns(7,
 			c.digitButton(1),
 			c.digitButton(2),
 			c.digitButton(3),
 			c.charButton('+'),
 			c.stringButton("++"),
-			c.stringButton("ln"),
-			c.stringButton("log")),
+			c.stringButton("tan"),
+			c.stringButton("atan")),
 		container.NewGridWithColumns(7,
 			//container.NewGridWithColumns(4,
 			c.digitButton(0),
 			c.charButton('.'),
 			c.stringButton("sqrt"),
-			c.charButton('x'),
+			c.charButton('^'),
 			//container.NewGridWithColumns(1,
-			equals),
+			equals,
+			c.stringButton("ln"),
+			c.stringButton("log")),
 	))
 
 	canvas := c.Window.Canvas()
@@ -137,7 +149,6 @@ func (c *Calc) LoadUI(a fyne.App) {
 
 	// handle ESC, Return, Enter, BackSpace
 	c.Window.Canvas().SetOnTypedKey(func(keyEvent *fyne.KeyEvent) {
-		log.Println(keyEvent.Name)
 		if keyEvent.Name == fyne.KeyEscape {
 			a.Quit()
 		} else if keyEvent.Name == fyne.KeyReturn || keyEvent.Name == fyne.KeyEnter {

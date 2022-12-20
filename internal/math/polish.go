@@ -14,10 +14,10 @@ var functions = []string{
 	"sqrt", "sin", "asin", "cos", "acos", "tan", "atan", "ln", "log",
 }
 
-func Calculate(input string) (result string) {
+func Calculate(input string, xVal float64) (result string) {
 	output := infixToPostfix(input)
 	fmt.Println(output)
-	res, err := evaluatePostfix(output)
+	res, err := evaluatePostfix(output, xVal)
 	if err != nil {
 		result = "error"
 	} else {
@@ -37,15 +37,6 @@ func precedence(s string) int {
 	} else {
 		return -1
 	}
-}
-
-func isOperator(input string) bool {
-	for _, op := range operators {
-		if strings.HasPrefix(input, op) {
-			return true
-		}
-	}
-	return false
 }
 
 func isFunction(input string) bool {
@@ -72,6 +63,8 @@ func infixToPostfix(infix string) (postfix Stack) {
 	for _, s := range inputLex {
 		if isDigit(s) {
 			postfix.Push(s)
+		} else if s == "x" {
+			postfix.Push("x")
 		} else if s == "(" || isFunction(s) {
 			sta.Push(s)
 		} else if s == ")" {
@@ -102,7 +95,6 @@ func infixToPostfix(infix string) (postfix Stack) {
 		postfix.Push(sta.Top())
 		sta.Pop()
 	}
-	//log.Println(postfix)
 	return
 }
 
@@ -113,7 +105,7 @@ func splitLex(input string) (res Stack) {
 		if ind >= len(input) {
 			break
 		}
-		if input[ind] == '(' || input[ind] == ')' {
+		if input[ind] == '(' || input[ind] == ')' || input[ind] == 'x' {
 			res.Push(string(input[ind]))
 			ind++
 		} else {
