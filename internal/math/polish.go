@@ -7,7 +7,7 @@ import (
 )
 
 var operators = []string{
-	"++", "--", "+", "-", "*", "/", "^", "mod", "sqrt", "sin", "asin", "cos", "acos", "tan", "atan", "ln", "log",
+	"+", "-", "*", "/", "^", "mod", "sqrt", "sin", "asin", "cos", "acos", "tan", "atan", "ln", "log",
 }
 
 var functions = []string{

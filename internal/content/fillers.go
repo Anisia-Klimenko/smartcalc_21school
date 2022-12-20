@@ -111,7 +111,7 @@ func (c *Calc) LoadUI(a fyne.App) {
 			c.charButton(')'),
 			c.charButton('/'),
 			c.charButton('x'),
-			widget.NewLabelWithStyle("x = ", fyne.TextAlignTrailing, fyne.TextStyle{Monospace: true}),
+			widget.NewLabelWithStyle("x = ", fyne.TextAlignCenter, fyne.TextStyle{Monospace: true}),
 			xEntry),
 		container.NewGridWithColumns(7,
 			c.digitButton(7),
@@ -126,7 +126,7 @@ func (c *Calc) LoadUI(a fyne.App) {
 			c.digitButton(5),
 			c.digitButton(6),
 			c.charButton('-'),
-			c.stringButton("--"),
+			c.stringButton("ln"),
 			c.stringButton("cos"),
 			c.stringButton("acos")),
 		container.NewGridWithColumns(7,
@@ -134,7 +134,7 @@ func (c *Calc) LoadUI(a fyne.App) {
 			c.digitButton(2),
 			c.digitButton(3),
 			c.charButton('+'),
-			c.stringButton("++"),
+			c.stringButton("log"),
 			c.stringButton("tan"),
 			c.stringButton("atan")),
 		container.NewGridWithColumns(7,
@@ -142,9 +142,7 @@ func (c *Calc) LoadUI(a fyne.App) {
 			c.charButton('.'),
 			c.stringButton("sqrt"),
 			c.charButton('^'),
-			equals,
-			c.stringButton("ln"),
-			c.stringButton("log")),
+			equals),
 	))
 
 	canvas := c.Window.Canvas()
