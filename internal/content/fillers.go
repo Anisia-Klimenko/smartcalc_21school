@@ -24,7 +24,9 @@ func NewCalculator() *Calc {
 
 func (c *Calc) display(newText string) {
 	c.Equation = newText
-	c.Output.SetText(newText)
+	if len(newText) <= 255 {
+		c.Output.SetText(newText)
+	}
 }
 
 func (c *Calc) character(char rune) {
@@ -104,7 +106,7 @@ func (c *Calc) LoadUI(a fyne.App) {
 
 	c.Window = a.NewWindow("Smart Calculator (c) acristin")
 	c.Window.SetContent(container.NewGridWithColumns(1,
-		c.Output,
+		container.NewHScroll(c.Output),
 		container.NewGridWithColumns(7,
 			c.addButton("C", c.clear),
 			c.charButton('('),
