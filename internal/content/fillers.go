@@ -4,6 +4,7 @@ import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
+	"log"
 	"strconv"
 )
 
@@ -121,7 +122,7 @@ func (c *Calc) LoadUI(a fyne.App) {
 
 	canvas := c.Window.Canvas()
 	canvas.SetOnTypedRune(c.onTypedRune)
-	canvas.SetOnTypedKey(c.onTypedKey)
+	//canvas.SetOnTypedKey(c.onTypedKey)
 	canvas.AddShortcut(&fyne.ShortcutCopy{}, c.onCopyShortcut)
 	canvas.AddShortcut(&fyne.ShortcutPaste{}, c.onPasteShortcut)
 
@@ -134,10 +135,15 @@ func (c *Calc) LoadUI(a fyne.App) {
 		//helpMenu,
 	)
 
-	// handle ESC
+	// handle ESC, Return, Enter, BackSpace
 	c.Window.Canvas().SetOnTypedKey(func(keyEvent *fyne.KeyEvent) {
+		log.Println(keyEvent.Name)
 		if keyEvent.Name == fyne.KeyEscape {
 			a.Quit()
+		} else if keyEvent.Name == fyne.KeyReturn || keyEvent.Name == fyne.KeyEnter {
+			c.evaluate()
+		} else if keyEvent.Name == fyne.KeyBackspace {
+			c.backspace()
 		}
 	})
 	c.Window.SetMainMenu(mainMenu)
