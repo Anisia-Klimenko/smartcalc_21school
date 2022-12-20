@@ -7,7 +7,7 @@ import (
 
 func main() {
 	a := app.New()
-	c := content.NewCalculator()
+	c := content.NewCalculator(a)
 	c.LoadUI(a)
 	a.Run()
 }

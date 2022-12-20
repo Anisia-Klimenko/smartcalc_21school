@@ -4,20 +4,25 @@ import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
+	"log"
 	"strconv"
 )
 
 type Calc struct {
 	Equation       string
 	XValue         float64
+	Borders        []float64
 	Output         *widget.Label
 	Buttons        map[string]*widget.Button
+	Entries        map[string]*widget.Entry
 	Window         fyne.Window
 	ifEqualPressed bool
+	App            fyne.App
 }
 
-func NewCalculator() *Calc {
+func NewCalculator(a fyne.App) *Calc {
 	return &Calc{
+		App:     a,
 		Buttons: make(map[string]*widget.Button, 32),
 	}
 }
@@ -87,8 +92,24 @@ func (c *Calc) stringButton(s string) *widget.Button {
 	})
 }
 
-func (c *Calc) LoadUI(a fyne.App) {
+func (c *Calc) changeXValue(s string) {
 	var err error
+	c.XValue, err = strconv.ParseFloat(s, 64)
+	if err != nil {
+		c.display("error")
+	}
+}
+
+func (c *Calc) addEntry(text string, action func(string)) *widget.Entry {
+	entry := widget.NewEntry()
+	entry.TextStyle.Monospace = true
+	entry.OnChanged = action
+	entry.PlaceHolder = text
+	log.Println(text, len(text))
+	return entry
+}
+
+func (c *Calc) LoadUI(a fyne.App) {
 	c.Output = &widget.Label{Alignment: fyne.TextAlignTrailing}
 	c.Output.TextStyle.Monospace = true
 
@@ -97,71 +118,60 @@ func (c *Calc) LoadUI(a fyne.App) {
 
 	xEntry := widget.NewEntry()
 	xEntry.TextStyle.Monospace = true
-	xEntry.OnChanged = func(s string) {
-		c.XValue, err = strconv.ParseFloat(s, 64)
-		if err != nil {
-			c.display("error")
-		}
-	}
+	xEntry.OnChanged = c.changeXValue
 
 	c.Window = a.NewWindow("Smart Calculator (c) acristin")
 	c.Window.SetContent(container.NewGridWithColumns(1,
 		container.NewHScroll(c.Output),
-		container.NewGridWithColumns(7,
+		container.NewGridWithColumns(8,
 			c.addButton("C", c.clear),
 			c.charButton('('),
 			c.charButton(')'),
 			c.charButton('/'),
 			c.charButton('x'),
-			widget.NewLabelWithStyle("x = ", fyne.TextAlignCenter, fyne.TextStyle{Monospace: true}),
-			xEntry),
-		container.NewGridWithColumns(7,
+			c.addEntry("x", c.changeXValue)),
+		container.NewGridWithColumns(8,
 			c.digitButton(7),
 			c.digitButton(8),
 			c.digitButton(9),
 			c.charButton('*'),
 			c.stringButton("mod"),
 			c.stringButton("sin"),
-			c.stringButton("asin")),
-		container.NewGridWithColumns(7,
+			c.stringButton("asin"),
+			c.addEntry("x min", c.changeXValue)),
+		container.NewGridWithColumns(8,
 			c.digitButton(4),
 			c.digitButton(5),
 			c.digitButton(6),
 			c.charButton('-'),
 			c.stringButton("ln"),
 			c.stringButton("cos"),
-			c.stringButton("acos")),
-		container.NewGridWithColumns(7,
+			c.stringButton("acos"),
+			c.addEntry("x max", c.changeXValue)),
+		container.NewGridWithColumns(8,
 			c.digitButton(1),
 			c.digitButton(2),
 			c.digitButton(3),
 			c.charButton('+'),
 			c.stringButton("log"),
 			c.stringButton("tan"),
-			c.stringButton("atan")),
-		container.NewGridWithColumns(7,
+			c.stringButton("atan"),
+			c.addEntry("y min", c.changeXValue)),
+		container.NewGridWithColumns(8,
 			c.digitButton(0),
 			c.charButton('.'),
 			c.stringButton("sqrt"),
 			c.charButton('^'),
 			c.charButton('e'),
-			equals),
+			equals,
+			c.addButton("plot", c.generatePlot),
+			c.addEntry("y max", c.changeXValue)),
 	))
 
 	canvas := c.Window.Canvas()
 	canvas.SetOnTypedRune(c.onTypedRune)
 	canvas.AddShortcut(&fyne.ShortcutCopy{}, c.onCopyShortcut)
 	canvas.AddShortcut(&fyne.ShortcutPaste{}, c.onPasteShortcut)
-
-	// add menu
-	fileMenu := fyne.NewMenu("Calculator Menu",
-		fyne.NewMenuItem("Quit", func() { a.Quit() }),
-	)
-	mainMenu := fyne.NewMainMenu(
-		fileMenu,
-		//helpMenu,
-	)
-	c.Window.SetMainMenu(mainMenu)
 
 	// handle ESC, Return, Enter, BackSpace
 	c.Window.Canvas().SetOnTypedKey(func(keyEvent *fyne.KeyEvent) {
@@ -173,7 +183,14 @@ func (c *Calc) LoadUI(a fyne.App) {
 			c.backspace()
 		}
 	})
-	c.Window.Resize(fyne.NewSize(500, 300))
+	c.Window.Resize(fyne.NewSize(600, 300))
+	// add menu
+	fileMenu := fyne.NewMenu("Calculator Menu",
+		fyne.NewMenuItem("Quit", func() { a.Quit() }),
+	)
+	mainMenu := fyne.NewMainMenu(
+		fileMenu,
+	)
+	c.Window.SetMainMenu(mainMenu)
 	c.Window.Show()
-
 }
