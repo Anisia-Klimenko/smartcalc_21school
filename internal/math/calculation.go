@@ -81,6 +81,8 @@ func calculate(operator string, operand1, operand2 float64) (float64, error) {
 		result = math.Pow(operand1, operand2)
 	case "mod":
 		result = operand1 - (operand2 * float64(int(operand1)/int(operand2)))
+	case "e":
+		result = operand1 * math.Pow(10, operand2)
 	default:
 		return 0.0, fmt.Errorf("invalid operator")
 	}

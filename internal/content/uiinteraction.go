@@ -20,6 +20,9 @@ func (c *Calc) onTypedRune(r rune) {
 	if r == 'c' {
 		r = 'C' // The button is using a capital C.
 	}
+	if r == 'E' {
+		r = 'e'
+	}
 
 	if button, ok := c.Buttons[string(r)]; ok {
 		button.OnTapped()

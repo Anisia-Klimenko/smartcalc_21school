@@ -144,6 +144,7 @@ func (c *Calc) LoadUI(a fyne.App) {
 			c.charButton('.'),
 			c.stringButton("sqrt"),
 			c.charButton('^'),
+			c.charButton('e'),
 			equals),
 	))
 

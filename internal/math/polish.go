@@ -7,7 +7,7 @@ import (
 )
 
 var operators = []string{
-	"+", "-", "*", "/", "^", "mod", "sqrt", "sin", "asin", "cos", "acos", "tan", "atan", "ln", "log",
+	"+", "-", "*", "/", "^", "mod", "sqrt", "sin", "asin", "cos", "acos", "tan", "atan", "ln", "log", "e",
 }
 
 var functions = []string{
@@ -20,17 +20,19 @@ func Calculate(input string, xVal float64) (result string) {
 	res, err := evaluatePostfix(output, xVal)
 	if err != nil {
 		result = "error"
-	} else if res == float64(int(res)) {
-		result = fmt.Sprint(res)
 	} else {
-		result = fmt.Sprintf("%.7f", res)
+		result = strconv.FormatFloat(res, 'f', -1, 64)
+		ind := strings.Index(result, ".")
+		if ind > -1 && len(result[ind:]) > 7 {
+			result = result[:ind+8]
+		}
 	}
 	return
 }
 
 // Function to return precedence of operators
 func precedence(s string) int {
-	if s == "^" || isFunction(s) {
+	if s == "^" || isFunction(s) || s == "e" {
 		return 3
 	} else if s == "/" || s == "*" || s == "mod" {
 		return 2
@@ -107,7 +109,7 @@ func splitLex(input string) (res Stack) {
 		if ind >= len(input) {
 			break
 		}
-		if input[ind] == '(' || input[ind] == ')' || input[ind] == 'x' {
+		if input[ind] == '(' || input[ind] == ')' || input[ind] == 'x' || input[ind] == 'e' {
 			res.Push(string(input[ind]))
 			ind++
 		} else {
