@@ -8,11 +8,12 @@ import (
 )
 
 type Calc struct {
-	Equation string
-	XValue   float64
-	Output   *widget.Label
-	Buttons  map[string]*widget.Button
-	Window   fyne.Window
+	Equation       string
+	XValue         float64
+	Output         *widget.Label
+	Buttons        map[string]*widget.Button
+	Window         fyne.Window
+	ifEqualPressed bool
 }
 
 func NewCalculator() *Calc {
@@ -47,12 +48,20 @@ func (c *Calc) addButton(text string, action func()) *widget.Button {
 func (c *Calc) digitButton(number int) *widget.Button {
 	str := strconv.Itoa(number)
 	return c.addButton(str, func() {
+		if c.ifEqualPressed {
+			c.clear()
+			c.ifEqualPressed = false
+		}
 		c.digit(number)
 	})
 }
 
 func (c *Calc) charButton(char rune) *widget.Button {
 	return c.addButton(string(char), func() {
+		if c.ifEqualPressed {
+			c.clear()
+			c.ifEqualPressed = false
+		}
 		c.character(char)
 	})
 }
@@ -60,10 +69,18 @@ func (c *Calc) charButton(char rune) *widget.Button {
 func (c *Calc) stringButton(s string) *widget.Button {
 	if s == "mod" {
 		return c.addButton(s, func() {
+			if c.ifEqualPressed {
+				c.clear()
+				c.ifEqualPressed = false
+			}
 			c.string(s)
 		})
 	}
 	return c.addButton(s, func() {
+		if c.ifEqualPressed {
+			c.clear()
+			c.ifEqualPressed = false
+		}
 		c.string(s + "(")
 	})
 }
@@ -121,12 +138,10 @@ func (c *Calc) LoadUI(a fyne.App) {
 			c.stringButton("tan"),
 			c.stringButton("atan")),
 		container.NewGridWithColumns(7,
-			//container.NewGridWithColumns(4,
 			c.digitButton(0),
 			c.charButton('.'),
 			c.stringButton("sqrt"),
 			c.charButton('^'),
-			//container.NewGridWithColumns(1,
 			equals,
 			c.stringButton("ln"),
 			c.stringButton("log")),
@@ -134,7 +149,6 @@ func (c *Calc) LoadUI(a fyne.App) {
 
 	canvas := c.Window.Canvas()
 	canvas.SetOnTypedRune(c.onTypedRune)
-	//canvas.SetOnTypedKey(c.onTypedKey)
 	canvas.AddShortcut(&fyne.ShortcutCopy{}, c.onCopyShortcut)
 	canvas.AddShortcut(&fyne.ShortcutPaste{}, c.onPasteShortcut)
 
