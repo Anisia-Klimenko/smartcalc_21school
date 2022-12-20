@@ -20,6 +20,8 @@ func Calculate(input string, xVal float64) (result string) {
 	res, err := evaluatePostfix(output, xVal)
 	if err != nil {
 		result = "error"
+	} else if res == float64(int(res)) {
+		result = fmt.Sprint(res)
 	} else {
 		result = fmt.Sprintf("%.7f", res)
 	}
