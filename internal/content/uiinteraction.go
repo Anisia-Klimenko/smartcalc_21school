@@ -26,14 +26,6 @@ func (c *Calc) onTypedRune(r rune) {
 	}
 }
 
-func (c *Calc) onTypedKey(ev *fyne.KeyEvent) {
-	if ev.Name == fyne.KeyReturn || ev.Name == fyne.KeyEnter {
-		c.evaluate()
-	} else if ev.Name == fyne.KeyBackspace {
-		c.backspace()
-	}
-}
-
 func (c *Calc) onPasteShortcut(shortcut fyne.Shortcut) {
 	content := shortcut.(*fyne.ShortcutPaste).Clipboard.Content()
 	if _, err := strconv.ParseFloat(content, 64); err != nil {
