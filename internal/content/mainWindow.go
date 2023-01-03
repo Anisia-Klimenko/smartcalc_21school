@@ -1,6 +1,7 @@
 package content
 
 import (
+	"calc/internal/history"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
@@ -183,9 +184,22 @@ func (c *Calc) LoadUI(a fyne.App) {
 			c.backspace()
 		}
 	})
+
 	c.Window.Resize(fyne.NewSize(600, 300))
+
 	// add menu
 	fileMenu := fyne.NewMenu("Calculator Menu",
+		fyne.NewMenuItem("History", func() {
+			history.ShowHistory(a)
+			//w2 := a.NewWindow("History")
+			//w2.SetContent(container.NewGridWithColumns(1,
+			//	container.NewScroll(widget.NewLabel(history.GetHistory())),
+			//	container.NewGridWithColumns(2,
+			//		widget.NewButton("Clear", history.ClearHistory),
+			//		widget.NewButton("Close", w2.Close))))
+			//w2.Resize(fyne.NewSize(500, 200))
+			//w2.Show()
+		}),
 		fyne.NewMenuItem("Quit", func() { a.Quit() }),
 	)
 	mainMenu := fyne.NewMainMenu(
