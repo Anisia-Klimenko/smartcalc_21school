@@ -185,6 +185,7 @@ func (c *Calc) LoadUI(a fyne.App) {
 		} else if keyEvent.Name == "H" {
 			log.Println("history")
 			history.ShowHistory(a)
+			c.display(c.Equation)
 		}
 	})
 

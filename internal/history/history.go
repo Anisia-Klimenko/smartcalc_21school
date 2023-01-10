@@ -6,6 +6,7 @@ import (
 	"fyne.io/fyne/v2/widget"
 	"log"
 	"os"
+	"strings"
 )
 
 func ClearHistory() {
@@ -40,20 +41,20 @@ func UpdateHistory(result string) {
 
 func ShowHistory(a fyne.App) {
 	w2 := a.NewWindow("History")
-	content := container.NewGridWithRows(1,
-		container.NewScroll(widget.NewLabel(GetHistory())),
-	)
-	content.Resize(fyne.Size{Height: 150})
-
+	var btns []fyne.CanvasObject
+	file := GetHistory()
+	for _, line := range strings.Split(strings.TrimSuffix(file, "\n"), "\n") {
+		btns = append(btns, widget.NewButton(line, func() {
+			log.Println(line)
+			w2.Close()
+		}))
+	}
 	w2.SetContent(container.NewGridWithColumns(1,
-		content,
-		//buts,
-		//container.New(
-		//	layout.NewHBoxLayout(),
-		//	//container.NewGridWithColumns(2,
-		//	widget.NewButton("Clear", ClearHistory),
-		//	layout.NewSpacer(),
-		//	widget.NewButton("Close", w2.Close))),
+		container.NewGridWithRows(1,
+			container.NewScroll(container.NewGridWithColumns(1,
+				container.NewGridWithColumns(1, btns...),
+			)),
+		),
 	))
 	w2.Canvas().SetOnTypedKey(func(keyEvent *fyne.KeyEvent) {
 		if keyEvent.Name == fyne.KeyEscape || keyEvent.Name == "W" {
