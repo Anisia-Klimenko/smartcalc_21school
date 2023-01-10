@@ -16,6 +16,6 @@ func (c *Calc) evaluate() {
 	log.Println(c.Output.Text)
 	result := math.Calculate(c.Output.Text, c.XValue)
 	historyText += result
-	history.SaveHistory(historyText)
+	history.UpdateHistory(historyText)
 	c.display(result)
 }

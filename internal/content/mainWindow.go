@@ -176,12 +176,15 @@ func (c *Calc) LoadUI(a fyne.App) {
 
 	// handle ESC, Return, Enter, BackSpace
 	c.Window.Canvas().SetOnTypedKey(func(keyEvent *fyne.KeyEvent) {
-		if keyEvent.Name == fyne.KeyEscape {
+		if keyEvent.Name == fyne.KeyEscape || keyEvent.Name == "W" {
 			a.Quit()
 		} else if keyEvent.Name == fyne.KeyReturn || keyEvent.Name == fyne.KeyEnter {
 			c.evaluate()
 		} else if keyEvent.Name == fyne.KeyBackspace {
 			c.backspace()
+		} else if keyEvent.Name == "H" {
+			log.Println("history")
+			history.ShowHistory(a)
 		}
 	})
 
@@ -189,21 +192,17 @@ func (c *Calc) LoadUI(a fyne.App) {
 
 	// add menu
 	fileMenu := fyne.NewMenu("Calculator Menu",
-		fyne.NewMenuItem("History", func() {
-			history.ShowHistory(a)
-			//w2 := a.NewWindow("History")
-			//w2.SetContent(container.NewGridWithColumns(1,
-			//	container.NewScroll(widget.NewLabel(history.GetHistory())),
-			//	container.NewGridWithColumns(2,
-			//		widget.NewButton("Clear", history.ClearHistory),
-			//		widget.NewButton("Close", w2.Close))))
-			//w2.Resize(fyne.NewSize(500, 200))
-			//w2.Show()
-		}),
 		fyne.NewMenuItem("Quit", func() { a.Quit() }),
+	)
+	historyMenu := fyne.NewMenu("History",
+		fyne.NewMenuItem("Show", func() {
+			history.ShowHistory(a)
+		}),
+		fyne.NewMenuItem("Clear", history.ClearHistory),
 	)
 	mainMenu := fyne.NewMainMenu(
 		fileMenu,
+		historyMenu,
 	)
 	c.Window.SetMainMenu(mainMenu)
 	c.Window.Show()
