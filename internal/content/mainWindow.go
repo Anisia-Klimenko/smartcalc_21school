@@ -110,6 +110,10 @@ func (c *Calc) addEntry(text string, action func(string)) *widget.Entry {
 	return entry
 }
 
+func (c *Calc) CopyEquation(text string) {
+	c.display(text)
+}
+
 func (c *Calc) LoadUI(a fyne.App) {
 	c.Output = &widget.Label{Alignment: fyne.TextAlignTrailing}
 	c.Output.TextStyle.Monospace = true
@@ -185,7 +189,10 @@ func (c *Calc) LoadUI(a fyne.App) {
 		} else if keyEvent.Name == "H" {
 			log.Println("history")
 			history.ShowHistory(a)
-			c.display(c.Equation)
+			operation := history.GetHistoryItem()
+			if len(operation) != 0 {
+				c.display(operation)
+			}
 		}
 	})
 
