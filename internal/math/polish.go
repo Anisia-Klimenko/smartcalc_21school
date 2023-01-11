@@ -1,7 +1,6 @@
 package math
 
 import (
-	"fmt"
 	"strconv"
 	"strings"
 )
@@ -16,7 +15,7 @@ var functions = []string{
 
 func Calculate(input string, xVal float64) (result string) {
 	output := infixToPostfix(input)
-	fmt.Println(output)
+	//fmt.Println(output)
 	res, err := evaluatePostfix(output, xVal)
 	if err != nil {
 		result = "error"

@@ -28,16 +28,3 @@ func NewPlot(eq string) *Plot {
 		Buttons:  make(map[string]*widget.Button, 1),
 	}
 }
-
-func (p *Plot) addButton(text string, action func()) *widget.Button {
-	button := widget.NewButton(text, action)
-	p.Buttons[text] = button
-	return button
-}
-
-func (c *Calc) generatePlot() {
-	c.Window = c.App.NewWindow("Plot (c) acristin")
-}
-
-func (p *Plot) LoadPlotWindow(a fyne.App) {
-}

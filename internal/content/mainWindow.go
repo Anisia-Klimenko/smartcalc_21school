@@ -11,10 +11,17 @@ import (
 	"strconv"
 )
 
+type Borders struct {
+	XMin float64
+	XMax float64
+	YMin float64
+	YMax float64
+}
+
 type Calc struct {
 	Equation       string
 	XValue         float64
-	Borders        []float64
+	Border         Borders
 	Output         *widget.Label
 	Buttons        map[string]*widget.Button
 	Entries        map[string]*widget.Entry
@@ -95,12 +102,12 @@ func (c *Calc) stringButton(s string) *widget.Button {
 	})
 }
 
-func (c *Calc) changeXValue(s string) {
-	var err error
-	c.XValue, err = strconv.ParseFloat(s, 64)
-	if err != nil {
-		c.display("error")
-	}
+func (c *Calc) changeXValue(s string, val *float64) {
+	//var err error
+	*val, _ = strconv.ParseFloat(s, 64)
+	//if err != nil {
+	//	c.display("error")
+	//}
 }
 
 func (c *Calc) addEntry(text string, action func(string)) *widget.Entry {
@@ -108,7 +115,6 @@ func (c *Calc) addEntry(text string, action func(string)) *widget.Entry {
 	entry.TextStyle.Monospace = true
 	entry.OnChanged = action
 	entry.PlaceHolder = text
-	log.Println(text, len(text))
 	return entry
 }
 
@@ -116,17 +122,34 @@ func (c *Calc) CopyEquation(text string) {
 	c.display(text)
 }
 
+func isInLimits(val float64) bool {
+	if val >= -1000000 && val <= 1000000 {
+		return true
+	}
+	return false
+}
+
+func (c *Calc) checkBorders() {
+	if c.Border.XMin >= c.Border.XMax || c.Border.YMin >= c.Border.YMax ||
+		!isInLimits(c.Border.XMin) || !isInLimits(c.Border.XMax) ||
+		!isInLimits(c.Border.YMin) || !isInLimits(c.Border.YMax) {
+		c.Border.XMin = 0
+		c.Border.YMin = 0
+		c.Border.XMax = 0
+		c.Border.YMax = 0
+		c.display("error")
+	}
+}
+
 func (c *Calc) LoadUI(a fyne.App) {
-	//plot.TestPlot(a)
 	c.Output = &widget.Label{Alignment: fyne.TextAlignTrailing}
 	c.Output.TextStyle.Monospace = true
 
 	equals := c.addButton("=", c.evaluate)
 	equals.Importance = widget.HighImportance
-
+	// ??? ->
 	xEntry := widget.NewEntry()
 	xEntry.TextStyle.Monospace = true
-	xEntry.OnChanged = c.changeXValue
 
 	c.Window = a.NewWindow("Smart Calculator (c) acristin")
 	c.Window.SetContent(container.NewGridWithColumns(1,
@@ -137,7 +160,7 @@ func (c *Calc) LoadUI(a fyne.App) {
 			c.charButton(')'),
 			c.charButton('/'),
 			c.charButton('x'),
-			c.addEntry("x", c.changeXValue)),
+			c.addEntry("x", func(s string) { c.changeXValue(s, &c.XValue) })),
 		container.NewGridWithColumns(8,
 			c.digitButton(7),
 			c.digitButton(8),
@@ -146,7 +169,7 @@ func (c *Calc) LoadUI(a fyne.App) {
 			c.stringButton("mod"),
 			c.stringButton("sin"),
 			c.stringButton("asin"),
-			c.addEntry("x min", c.changeXValue)),
+			c.addEntry("x min", func(s string) { c.changeXValue(s, &c.Border.XMin) })),
 		container.NewGridWithColumns(8,
 			c.digitButton(4),
 			c.digitButton(5),
@@ -155,7 +178,7 @@ func (c *Calc) LoadUI(a fyne.App) {
 			c.stringButton("ln"),
 			c.stringButton("cos"),
 			c.stringButton("acos"),
-			c.addEntry("x max", c.changeXValue)),
+			c.addEntry("x max", func(s string) { c.changeXValue(s, &c.Border.XMax) })),
 		container.NewGridWithColumns(8,
 			c.digitButton(1),
 			c.digitButton(2),
@@ -164,7 +187,7 @@ func (c *Calc) LoadUI(a fyne.App) {
 			c.stringButton("log"),
 			c.stringButton("tan"),
 			c.stringButton("atan"),
-			c.addEntry("y min", c.changeXValue)),
+			c.addEntry("y min", func(s string) { c.changeXValue(s, &c.Border.YMin) })),
 		container.NewGridWithColumns(8,
 			c.digitButton(0),
 			c.charButton('.'),
@@ -173,9 +196,10 @@ func (c *Calc) LoadUI(a fyne.App) {
 			c.charButton('e'),
 			equals,
 			c.addButton("plot", func() {
-				plot.TestPlot(a)
+				c.checkBorders()
+				plot.ShowPlot(a, c.Equation, plot.Borders(c.Border))
 			}),
-			c.addEntry("y max", c.changeXValue)),
+			c.addEntry("y max", func(s string) { c.changeXValue(s, &c.Border.YMax) })),
 	))
 
 	canvas := c.Window.Canvas()
@@ -203,7 +227,8 @@ func (c *Calc) LoadUI(a fyne.App) {
 			about.ShowAbout(a)
 		} else if keyEvent.Name == "P" {
 			log.Println("plot")
-			plot.TestPlot(a)
+			c.checkBorders()
+			plot.ShowPlot(a, c.Equation, plot.Borders(c.Border))
 		}
 	})
 

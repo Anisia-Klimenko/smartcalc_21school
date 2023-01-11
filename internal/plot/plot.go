@@ -1,6 +1,8 @@
 package plot
 
 import (
+	"calc/internal/file"
+	"calc/internal/math"
 	"fmt"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
@@ -9,11 +11,42 @@ import (
 	"image/color"
 	"io"
 	"os"
+	"strconv"
 )
 
-func TestPlot(a fyne.App) {
+type Borders struct {
+	XMin float64
+	XMax float64
+	YMin float64
+	YMax float64
+}
+
+func UpdateData(equation string, xMin, xMax, yMin, yMax float64) {
+	dataFile := "../assets/data.d"
+	file.Clear(dataFile)
+	file.Update(dataFile, "# y="+equation)
+	delta := (xMax - xMin) / 100
+	for i := xMin; i < xMax; i += delta {
+		result, err := strconv.ParseFloat(math.Calculate(equation, i), 64)
+		if err == nil {
+			file.Update(dataFile, fmt.Sprintf("%.2f\t%.4f", i, result))
+		}
+	}
+}
+
+func ShowPlot(a fyne.App, equation string, border Borders) {
 	var input io.Reader
 	var ferr error
+	equation = "2*x"
+	border.XMin = -10
+	border.XMax = 10
+	border.YMin = -10
+	border.YMax = 10
+	if border.XMin == 0 && border.XMax == 0 && border.YMin == 0 && border.YMax == 0 {
+		return
+	}
+
+	UpdateData(equation, border.XMin, border.XMax, border.YMin, border.YMax)
 
 	// Read from specified file
 	input, ferr = os.Open("../assets/data.d")
@@ -42,8 +75,8 @@ func TestPlot(a fyne.App) {
 	}
 	// Define the colors
 	datacolor := fc.ColorLookup("steelblue")
-	labelcolor := color.RGBA{100, 100, 100, 255}
-	bgcolor := color.RGBA{255, 255, 255, 255}
+	labelcolor := color.RGBA{R: 100, G: 100, B: 100, A: 255}
+	bgcolor := color.RGBA{R: 255, G: 255, B: 255, A: 255}
 	field.Rect(50, 50, 100, 100, bgcolor)
 
 	// Set the plot attributes
@@ -51,18 +84,15 @@ func TestPlot(a fyne.App) {
 
 	// Draw the data
 	plot.Color = datacolor
-	plot.Frame(field, 1)
-	plot.Line(field, 0.25)
+	//plot.Frame(field, 10)
+	plot.Line(field, 0.4)
 	plot.Bar(field, 0.25)
-	plot.Scatter(field, 0.5)
+	plot.Scatter(field, 0.25)
 
 	// Draw labels, axes if specified
 	plot.Color = labelcolor
 	plot.Label(field, 1.5, 5)
-	var yaxmin, yaxmax, yaxstep float64
-	if n, err := fmt.Sscanf("-1,1,0.25", "%v,%v,%v", &yaxmin, &yaxmax, &yaxstep); n == 3 && err == nil {
-		plot.YAxis(field, 1.5, yaxmin, yaxmax, yaxstep, "%v", true)
-	}
+	plot.YAxis(field, 1.5, border.YMin, border.YMax, (border.YMax-border.YMin)/10, "%.2f", true)
 
 	field.Window.Canvas().SetOnTypedKey(func(keyEvent *fyne.KeyEvent) {
 		if keyEvent.Name == fyne.KeyEscape || keyEvent.Name == "W" {
