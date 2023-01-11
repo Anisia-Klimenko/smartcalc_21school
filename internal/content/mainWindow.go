@@ -1,6 +1,7 @@
 package content
 
 import (
+	"calc/internal/about"
 	"calc/internal/history"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
@@ -193,6 +194,9 @@ func (c *Calc) LoadUI(a fyne.App) {
 			if len(operation) != 0 {
 				c.display(operation)
 			}
+		} else if keyEvent.Name == "A" {
+			log.Println("about")
+			about.ShowAbout(a)
 		}
 	})
 
@@ -201,13 +205,19 @@ func (c *Calc) LoadUI(a fyne.App) {
 	// add menu
 	fileMenu := fyne.NewMenu("Calculator Menu",
 		fyne.NewMenuItem("About", func() {
-
+			log.Println("about")
+			about.ShowAbout(a)
 		}),
 		fyne.NewMenuItem("Quit", func() { a.Quit() }),
 	)
 	historyMenu := fyne.NewMenu("History",
 		fyne.NewMenuItem("Show", func() {
+			log.Println("history")
 			history.ShowHistory(a)
+			operation := history.GetHistoryItem()
+			if len(operation) != 0 {
+				c.display(operation)
+			}
 		}),
 		fyne.NewMenuItem("Clear", history.ClearHistory),
 	)

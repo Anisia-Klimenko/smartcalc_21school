@@ -1,0 +1,23 @@
+Smart Calculator (c) acristin
+
+Implementation of SmartCalc v3.0 in Go language.
+
+Bracket arithmetic expressions in infix notation support
+arithmetic operations and mathematical functions, including unary
+plus and minus.
+
+Calculator can understand expressions with X, if X was given in a
+field, or can plot charts within given borders (x min/max,
+y min/max)
+
+App menu allow to open calculation history, load chosen expression
+or clear history. History is saved between application launches.
+
+APP SHORTCUTS
+C                    clear expression
+BackSpace   pushed the typewriter carriage one position backwards,
+                      or clear history if History is opened
+W, ESC         close current window, or quit app if only main window
+                      is opened (last = Calculator Menu -> Quit)
+A                   open calculator reference (= Calculator Menu -> About)
+H                   open calculation history (= History -> Show)
