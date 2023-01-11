@@ -3,6 +3,7 @@ package content
 import (
 	"calc/internal/about"
 	"calc/internal/history"
+	"calc/internal/plot"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
@@ -116,6 +117,7 @@ func (c *Calc) CopyEquation(text string) {
 }
 
 func (c *Calc) LoadUI(a fyne.App) {
+	//plot.TestPlot(a)
 	c.Output = &widget.Label{Alignment: fyne.TextAlignTrailing}
 	c.Output.TextStyle.Monospace = true
 
@@ -170,7 +172,9 @@ func (c *Calc) LoadUI(a fyne.App) {
 			c.charButton('^'),
 			c.charButton('e'),
 			equals,
-			c.addButton("plot", c.generatePlot),
+			c.addButton("plot", func() {
+				plot.TestPlot(a)
+			}),
 			c.addEntry("y max", c.changeXValue)),
 	))
 
@@ -197,6 +201,9 @@ func (c *Calc) LoadUI(a fyne.App) {
 		} else if keyEvent.Name == "A" {
 			log.Println("about")
 			about.ShowAbout(a)
+		} else if keyEvent.Name == "P" {
+			log.Println("plot")
+			plot.TestPlot(a)
 		}
 	})
 

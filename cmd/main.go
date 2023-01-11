@@ -6,6 +6,7 @@ import (
 )
 
 func main() {
+	//plot.TestPlot()
 	a := app.New()
 	c := content.NewCalculator(a)
 	c.LoadUI(a)
