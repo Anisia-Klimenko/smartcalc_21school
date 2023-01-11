@@ -1,6 +1,7 @@
 package history
 
 import (
+	"calc/internal/file"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
@@ -12,65 +13,29 @@ import (
 var wasShown = false
 
 func ClearHistory() {
-	f, err := os.OpenFile("../assets/log.txt", os.O_WRONLY|os.O_CREATE, 0600)
-	if err != nil {
-		log.Println(err)
-	}
-
-	defer f.Close()
-
-	f.Truncate(0)
-	f.Seek(0, 0)
+	file.Clear("../assets/log.txt")
 }
 
 func GetHistory() string {
-	result, _ := os.ReadFile("../assets/log.txt")
-	return string(result)
+	return file.Content("../assets/log.txt")
 }
 
-func UpdateHistory(result string) {
-	f, err := os.OpenFile("../assets/log.txt", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
-	if err != nil {
-		log.Println(err)
-	}
-
-	defer f.Close()
-
-	if _, err = f.WriteString(result + "\n"); err != nil {
-		log.Println(err)
-	}
+func UpdateHistory(content string) {
+	file.Update("../assets/log.txt", content)
 }
 
 func GetHistoryItem() string {
 	for !wasShown {
 	}
 	result, _ := os.ReadFile("../assets/item.txt")
-	f, err := os.OpenFile("../assets/item.txt", os.O_WRONLY|os.O_CREATE, 0600)
-	if err != nil {
-		log.Println(err)
-	}
-
-	defer f.Close()
-
-	f.Truncate(0)
-	f.Seek(0, 0)
+	file.Clear("../assets/item.txt")
 	res := strings.Split(string(result), "=")[0]
-	log.Println("getting", res, "...")
 	wasShown = false
 	return res
 }
 
-func saveHistoryItem(result string) {
-	f, err := os.OpenFile("../assets/item.txt", os.O_TRUNC|os.O_WRONLY|os.O_CREATE, 0600)
-	if err != nil {
-		log.Println(err)
-	}
-
-	defer f.Close()
-
-	if _, err = f.WriteString(result + "\n"); err != nil {
-		log.Println(err)
-	}
+func saveHistoryItem(content string) {
+	file.Rewrite("../assets/item.txt", content)
 }
 
 func ShowHistory(a fyne.App) {

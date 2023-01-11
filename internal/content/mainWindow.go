@@ -200,6 +200,9 @@ func (c *Calc) LoadUI(a fyne.App) {
 
 	// add menu
 	fileMenu := fyne.NewMenu("Calculator Menu",
+		fyne.NewMenuItem("About", func() {
+
+		}),
 		fyne.NewMenuItem("Quit", func() { a.Quit() }),
 	)
 	historyMenu := fyne.NewMenu("History",
