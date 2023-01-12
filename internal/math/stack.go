@@ -2,17 +2,17 @@ package math
 
 type Stack []string
 
-// IsEmpty check if stack is empty
+// IsEmpty checks if stack is empty
 func (st *Stack) IsEmpty() bool {
 	return len(*st) == 0
 }
 
-// Push a new value onto the stack
+// Push pushes a new value onto the stack
 func (st *Stack) Push(str string) {
 	*st = append(*st, str)
 }
 
-// Pop remove top element of stack. Return false if stack is empty.
+// Pop removes top element of stack. Returns false if stack is empty.
 func (st *Stack) Pop() bool {
 	if st.IsEmpty() {
 		return false
@@ -23,7 +23,7 @@ func (st *Stack) Pop() bool {
 	}
 }
 
-// Top return top element of stack. Return false if stack is empty.
+// Top returns top element of stack. Returns false if stack is empty.
 func (st *Stack) Top() string {
 	if st.IsEmpty() {
 		return ""
@@ -36,17 +36,17 @@ func (st *Stack) Top() string {
 
 type StackFloat []float64
 
-// IsEmpty check if stack is empty
+// IsEmpty checks if stack is empty
 func (st *StackFloat) IsEmpty() bool {
 	return len(*st) == 0
 }
 
-// Push a new value onto the stack
+// Push pushes a new value onto the stack
 func (st *StackFloat) Push(str float64) {
 	*st = append(*st, str)
 }
 
-// Pop remove top element of stack. Return false if stack is empty.
+// Pop removes top element of stack. Returns false if stack is empty.
 func (st *StackFloat) Pop() bool {
 	if st.IsEmpty() {
 		return false
@@ -57,7 +57,7 @@ func (st *StackFloat) Pop() bool {
 	}
 }
 
-// Top return top element of stack. Return false if stack is empty.
+// Top returns top element of stack. Returns false if stack is empty.
 func (st *StackFloat) Top() float64 {
 	if st.IsEmpty() {
 		return 0.0

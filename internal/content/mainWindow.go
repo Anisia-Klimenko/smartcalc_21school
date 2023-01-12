@@ -8,9 +8,9 @@ import (
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
 	"log"
-	"strconv"
 )
 
+// Borders includes borders for plot
 type Borders struct {
 	XMin float64
 	XMax float64
@@ -30,6 +30,7 @@ type Calc struct {
 	App            fyne.App
 }
 
+// NewCalculator creates new Calc object
 func NewCalculator(a fyne.App) *Calc {
 	return &Calc{
 		App:     a,
@@ -37,122 +38,19 @@ func NewCalculator(a fyne.App) *Calc {
 	}
 }
 
-func (c *Calc) display(newText string) {
-	c.Equation = newText
-	if len(newText) <= 255 {
-		c.Output.SetText(newText)
-	}
-}
-
-func (c *Calc) character(char rune) {
-	c.display(c.Equation + string(char))
-}
-
-func (c *Calc) digit(d int) {
-	c.character(rune(d) + '0')
-}
-
-func (c *Calc) string(s string) {
-	c.display(c.Equation + s)
-}
-
-func (c *Calc) addButton(text string, action func()) *widget.Button {
-	button := widget.NewButton(text, action)
-	c.Buttons[text] = button
-	return button
-}
-
-func (c *Calc) digitButton(number int) *widget.Button {
-	str := strconv.Itoa(number)
-	return c.addButton(str, func() {
-		if c.ifEqualPressed || c.Output.Text == "error" {
-			c.clear()
-			c.ifEqualPressed = false
-		}
-		c.digit(number)
-	})
-}
-
-func (c *Calc) charButton(char rune) *widget.Button {
-	return c.addButton(string(char), func() {
-		if c.ifEqualPressed {
-			c.clear()
-			c.ifEqualPressed = false
-		}
-		c.character(char)
-	})
-}
-
-func (c *Calc) stringButton(s string) *widget.Button {
-	if s == "mod" {
-		return c.addButton(s, func() {
-			if c.ifEqualPressed {
-				c.clear()
-				c.ifEqualPressed = false
-			}
-			c.string(s)
-		})
-	}
-	return c.addButton(s, func() {
-		if c.ifEqualPressed {
-			c.clear()
-			c.ifEqualPressed = false
-		}
-		c.string(s + "(")
-	})
-}
-
-func (c *Calc) changeXValue(s string, val *float64) {
-	*val, _ = strconv.ParseFloat(s, 64)
-}
-
-func (c *Calc) addEntry(text string, action func(string)) *widget.Entry {
-	entry := widget.NewEntry()
-	entry.TextStyle.Monospace = true
-	entry.OnChanged = action
-	entry.PlaceHolder = text
-	return entry
-}
-
-func (c *Calc) CopyEquation(text string) {
-	c.display(text)
-}
-
-func isInLimits(val float64) bool {
-	if val >= -1000000 && val <= 1000000 {
-		return true
-	}
-	return false
-}
-
-func (c *Calc) checkBorders() {
-	if c.Border.XMin == 0 && c.Border.XMax == 0 {
-		c.Border.XMin = -10
-		c.Border.XMax = 10
-	}
-	if c.Border.YMin == 0 && c.Border.YMax == 0 {
-		c.Border.YMin = -30
-		c.Border.YMax = 30
-	}
-	if c.Border.XMin >= c.Border.XMax || c.Border.YMin >= c.Border.YMax ||
-		!isInLimits(c.Border.XMin) || !isInLimits(c.Border.XMax) ||
-		!isInLimits(c.Border.YMin) || !isInLimits(c.Border.YMax) {
-		c.Border.XMin = 0
-		c.Border.YMin = 0
-		c.Border.XMax = 0
-		c.Border.YMax = 0
-		c.display("non valid borders")
-	}
-}
-
+// LoadUI creates main window, interface and menu, calls handlers
 func (c *Calc) LoadUI(a fyne.App) {
 	log.Println("app: start ...")
+
+	// Creates output and set output style
 	c.Output = &widget.Label{Alignment: fyne.TextAlignTrailing}
 	c.Output.TextStyle.Monospace = true
 
+	// Create equal button and set its importance
 	equals := c.addButton("=", c.evaluate)
 	equals.Importance = widget.HighImportance
 
+	// Create main window and set content
 	c.Window = a.NewWindow("Smart Calculator (c) acristin")
 	c.Window.SetContent(container.NewGridWithColumns(1,
 		container.NewHScroll(c.Output),
@@ -208,35 +106,42 @@ func (c *Calc) LoadUI(a fyne.App) {
 
 	canvas := c.Window.Canvas()
 	canvas.SetOnTypedRune(c.onTypedRune)
-	canvas.AddShortcut(&fyne.ShortcutCopy{}, c.onCopyShortcut)
-	canvas.AddShortcut(&fyne.ShortcutPaste{}, c.onPasteShortcut)
+	//canvas.AddShortcut(&fyne.ShortcutCopy{}, c.onCopyShortcut)
+	//canvas.AddShortcut(&fyne.ShortcutPaste{}, c.onPasteShortcut)
 
-	// handle ESC, Return, Enter, BackSpace
+	// Handle shortcuts
 	c.Window.Canvas().SetOnTypedKey(func(keyEvent *fyne.KeyEvent) {
 		if keyEvent.Name == fyne.KeyEscape || keyEvent.Name == "W" {
+			// Quit app in case ESC or W was pressed
 			log.Println("app: quit ...")
 			a.Quit()
 		} else if keyEvent.Name == fyne.KeyReturn || keyEvent.Name == fyne.KeyEnter {
+			// Evaluate equation in case Return or Enter was pressed
 			c.evaluate()
 		} else if keyEvent.Name == fyne.KeyBackspace {
+			// Push the typewriter carriage one position backwards in case
+			// BackSpace was pressed
 			c.backspace()
 		} else if keyEvent.Name == "H" {
+			// Open history in case H was pressed
 			history.ShowHistory(a)
+			// Get chosen operation
 			operation := history.GetHistoryItem()
+			// Display operation if it was chosen
 			if len(operation) != 0 {
 				c.display(operation)
 			}
 		} else if keyEvent.Name == "A" {
+			// Open reference in case A was pressed
 			about.ShowAbout(a)
 		} else if keyEvent.Name == "P" {
+			// Build plot in case P was pressed
 			c.checkBorders()
 			plot.ShowPlot(a, c.Equation, plot.Borders(c.Border))
 		}
 	})
 
-	c.Window.Resize(fyne.NewSize(600, 300))
-
-	// add menu
+	// Add app menu
 	fileMenu := fyne.NewMenu("Calculator Menu",
 		fyne.NewMenuItem("About", func() { about.ShowAbout(a) }),
 		fyne.NewMenuItem("Quit", func() {
@@ -259,5 +164,8 @@ func (c *Calc) LoadUI(a fyne.App) {
 		historyMenu,
 	)
 	c.Window.SetMainMenu(mainMenu)
+
+	// Show window
+	c.Window.Resize(fyne.NewSize(600, 300))
 	c.Window.Show()
 }

@@ -5,21 +5,28 @@ import (
 	"strings"
 )
 
+// all operators and functions
 var operators = []string{
 	"+", "-", "*", "/", "^", "mod", "sqrt", "sin", "asin", "cos", "acos", "tan", "atan", "ln", "log", "e",
 }
 
+// all functions
 var functions = []string{
 	"sqrt", "sin", "asin", "cos", "acos", "tan", "atan", "ln", "log",
 }
 
+// Calculate calculates result of input equation with passing x value xVal
 func Calculate(input string, xVal float64) (result string) {
+	// Convert infix notation to postfix
 	output := infixToPostfix(input)
 	//fmt.Println(output)
+
+	// Evaluate expression
 	res, err := evaluatePostfix(output, xVal)
 	if err != nil {
 		result = "error"
 	} else {
+		// Format result
 		result = strconv.FormatFloat(res, 'f', -1, 64)
 		ind := strings.Index(result, ".")
 		if ind > -1 && len(result[ind:]) > 7 {
@@ -29,7 +36,7 @@ func Calculate(input string, xVal float64) (result string) {
 	return
 }
 
-// Function to return precedence of operators
+// precedence returns precedence of operators
 func precedence(s string) int {
 	if s == "^" || isFunction(s) || s == "e" {
 		return 3
@@ -42,6 +49,7 @@ func precedence(s string) int {
 	}
 }
 
+// isFunction checks if input is a function
 func isFunction(input string) bool {
 	for _, f := range functions {
 		if input == f {
@@ -51,6 +59,7 @@ func isFunction(input string) bool {
 	return false
 }
 
+// isDigit checks if input is a digit
 func isDigit(input string) bool {
 	_, err := strconv.ParseFloat(input, 64)
 	if err != nil {
@@ -59,8 +68,9 @@ func isDigit(input string) bool {
 	return true
 }
 
-// infixToPostfix convert infix notation to postfix
+// infixToPostfix convert infix notation to postfix using Dijkstra's algorithm
 func infixToPostfix(infix string) (postfix Stack) {
+	// Split input into lexemes
 	inputLex := splitLex(infix)
 	var sta Stack
 	for _, s := range inputLex {
@@ -101,6 +111,7 @@ func infixToPostfix(infix string) (postfix Stack) {
 	return
 }
 
+// splitLex splits input into lexemes and returns result as Stack
 func splitLex(input string) (res Stack) {
 	var digit string
 	var ind = 0

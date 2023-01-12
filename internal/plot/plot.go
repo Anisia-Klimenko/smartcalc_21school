@@ -22,26 +22,36 @@ type Borders struct {
 	YMax float64
 }
 
+// UpdateData generates data file for plotting
 func UpdateData(equation string, xMin, xMax, yMin, yMax float64) (float64, float64) {
 	var newMin, newMax = yMax, yMin
 	dataFile := "../assets/data.d"
+
+	// Clear file before writing
 	file.Clear(dataFile)
+
+	// Set plot title
 	file.Update(dataFile, "# y="+equation)
+
+	// Generate dataset
 	delta := (xMax - xMin) / 100
 	for i := xMin; i < xMax; i += delta {
 		result, err := strconv.ParseFloat(math.Calculate(equation, i), 64)
 		if err == nil {
+			// Handle borders
 			if result > yMax {
 				result = yMax
 			} else if result < yMin {
 				result = yMin
 			}
+			// Find new yMax and yMin
 			if result > newMax {
 				newMax = result
 			}
 			if result < newMin {
 				newMin = result
 			}
+			// Check if result is not NaN
 			if result == result {
 				file.Update(dataFile, fmt.Sprintf("%.2f\t%.7f", i, result))
 			}
@@ -53,13 +63,16 @@ func UpdateData(equation string, xMin, xMax, yMin, yMax float64) (float64, float
 func ShowPlot(a fyne.App, equation string, border Borders) {
 	var input io.Reader
 	var ferr error
+	// Handle non-valid borders
 	if border.XMin == 0 && border.XMax == 0 && border.YMin == 0 && border.YMax == 0 {
 		log.Println("plot: non valid borders")
 		return
 	}
 	log.Println("plot: opened")
 
+	// Generate dataset and save to file, update y-borders
 	border.YMin, border.YMax = UpdateData(equation, border.XMin, border.XMax, border.YMin, border.YMax)
+
 	// Read from specified file
 	input, ferr = os.Open("../assets/data.d")
 	if ferr != nil {
@@ -67,7 +80,7 @@ func ShowPlot(a fyne.App, equation string, border Borders) {
 		return
 	}
 
-	// Read in the data
+	// Read dataset
 	plot, err := chart.DataRead(input)
 	if err != nil {
 		log.Println("plot: data file read error")
@@ -86,37 +99,37 @@ func ShowPlot(a fyne.App, equation string, border Borders) {
 		Width:     float64(w),
 		Height:    float64(h),
 	}
+
 	// Define the colors
-	datacolor := fc.ColorLookup("steelblue")
-	labelcolor := color.RGBA{R: 100, G: 100, B: 100, A: 255}
-	bgcolor := color.RGBA{R: 255, G: 255, B: 255, A: 255}
-	field.Rect(50, 50, 100, 100, bgcolor)
+	dataColor := fc.ColorLookup("steelblue")
+	labelColor := color.RGBA{R: 100, G: 100, B: 100, A: 255}
+	bgColor := color.RGBA{R: 255, G: 255, B: 255, A: 255}
+	field.Rect(50, 50, 100, 100, bgColor)
 
 	// Set the plot attributes
 	plot.Zerobased = true
-
-	// Draw the data
-	plot.Color = datacolor
-	//plot.Frame(field, 10)
+	plot.Color = dataColor
 	plot.Line(field, 0.25)
 	plot.Bar(field, 0.25)
 	plot.Scatter(field, 0.25)
 
-	// Draw labels, axes if specified
-	plot.Color = labelcolor
+	// Draw labels and axes
+	plot.Color = labelColor
 	plot.Label(field, 1.5, 5)
 	plot.YAxis(field, 1.5, border.YMin, border.YMax, (border.YMax-border.YMin)/20, "%.2f", true)
 
+	// Handle shortcuts
 	field.Window.Canvas().SetOnTypedKey(func(keyEvent *fyne.KeyEvent) {
 		if keyEvent.Name == fyne.KeyEscape || keyEvent.Name == "W" {
+			// Close window in case ESC or W was pressed
 			field.Window.Close()
 			log.Println("plot: closed")
 		}
 	})
 
-	// Show the plot
+	// Show the plot window
 	field.Window.Resize(fyne.NewSize(600, 600))
-	field.Window.SetPadded(false)
+	//field.Window.SetPadded(true)
 	field.Window.SetContent(field.Container)
 	field.Window.Show()
 }
