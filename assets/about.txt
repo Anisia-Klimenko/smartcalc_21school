@@ -21,3 +21,4 @@ W, ESC         close current window, or quit app if only main window
                       is opened (last = Calculator Menu -> Quit)
 A                   open calculator reference (= Calculator Menu -> About)
 H                   open calculation history (= History -> Show)
+P                   open plot window
