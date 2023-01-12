@@ -5,7 +5,6 @@ import (
 	"calc/internal/math"
 	"fyne.io/fyne/v2"
 	"log"
-	"strconv"
 )
 
 // backspace pushes the typewriter carriage one position backwards
@@ -76,10 +75,6 @@ func (c *Calc) evaluate() {
 
 func (c *Calc) onPasteShortcut(shortcut fyne.Shortcut) {
 	content := shortcut.(*fyne.ShortcutPaste).Clipboard.Content()
-	if _, err := strconv.ParseFloat(content, 64); err != nil {
-		return
-	}
-
 	c.display(c.Equation + content)
 }
 

@@ -114,12 +114,13 @@ func (c *Calc) LoadUI(a fyne.App) {
 			c.addEntry("y max", func(s string) { c.changeBorderValue(s, &c.Border.YMax, &c.IsBorderSet.YMax) })),
 	))
 
+	// Handle typed symbols
 	canvas := c.Window.Canvas()
 	canvas.SetOnTypedRune(c.onTypedRune)
-	//canvas.AddShortcut(&fyne.ShortcutCopy{}, c.onCopyShortcut)
-	//canvas.AddShortcut(&fyne.ShortcutPaste{}, c.onPasteShortcut)
 
 	// Handle shortcuts
+	canvas.AddShortcut(&fyne.ShortcutCopy{}, c.onCopyShortcut)   // cmd + C
+	canvas.AddShortcut(&fyne.ShortcutPaste{}, c.onPasteShortcut) // cmd + V
 	c.Window.Canvas().SetOnTypedKey(func(keyEvent *fyne.KeyEvent) {
 		if keyEvent.Name == fyne.KeyEscape || keyEvent.Name == "W" {
 			// Quit app in case ESC or W was pressed
