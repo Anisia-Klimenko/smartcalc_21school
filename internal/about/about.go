@@ -5,6 +5,7 @@ import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
+	"log"
 )
 
 func GetAbout() string {
@@ -16,6 +17,7 @@ func GetAbout() string {
 }
 
 func ShowAbout(a fyne.App) {
+	log.Println("about: opened")
 	w3 := a.NewWindow("About")
 	about := GetAbout()
 	w3.SetContent(container.NewGridWithColumns(1,
@@ -24,6 +26,7 @@ func ShowAbout(a fyne.App) {
 	w3.Canvas().SetOnTypedKey(func(keyEvent *fyne.KeyEvent) {
 		if keyEvent.Name == fyne.KeyEscape || keyEvent.Name == "W" {
 			w3.Close()
+			log.Println("about: closed")
 		}
 	})
 	w3.Resize(fyne.NewSize(500, 400))

@@ -65,7 +65,7 @@ func (c *Calc) addButton(text string, action func()) *widget.Button {
 func (c *Calc) digitButton(number int) *widget.Button {
 	str := strconv.Itoa(number)
 	return c.addButton(str, func() {
-		if c.ifEqualPressed {
+		if c.ifEqualPressed || c.Output.Text == "error" {
 			c.clear()
 			c.ifEqualPressed = false
 		}
@@ -103,11 +103,7 @@ func (c *Calc) stringButton(s string) *widget.Button {
 }
 
 func (c *Calc) changeXValue(s string, val *float64) {
-	//var err error
 	*val, _ = strconv.ParseFloat(s, 64)
-	//if err != nil {
-	//	c.display("error")
-	//}
 }
 
 func (c *Calc) addEntry(text string, action func(string)) *widget.Entry {
@@ -135,8 +131,8 @@ func (c *Calc) checkBorders() {
 		c.Border.XMax = 10
 	}
 	if c.Border.YMin == 0 && c.Border.YMax == 0 {
-		c.Border.YMin = -1000000
-		c.Border.YMax = 1000000
+		c.Border.YMin = -30
+		c.Border.YMax = 30
 	}
 	if c.Border.XMin >= c.Border.XMax || c.Border.YMin >= c.Border.YMax ||
 		!isInLimits(c.Border.XMin) || !isInLimits(c.Border.XMax) ||
@@ -145,19 +141,17 @@ func (c *Calc) checkBorders() {
 		c.Border.YMin = 0
 		c.Border.XMax = 0
 		c.Border.YMax = 0
-		c.display("error")
+		c.display("non valid borders")
 	}
 }
 
 func (c *Calc) LoadUI(a fyne.App) {
+	log.Println("app: start ...")
 	c.Output = &widget.Label{Alignment: fyne.TextAlignTrailing}
 	c.Output.TextStyle.Monospace = true
 
 	equals := c.addButton("=", c.evaluate)
 	equals.Importance = widget.HighImportance
-	// ??? ->
-	xEntry := widget.NewEntry()
-	xEntry.TextStyle.Monospace = true
 
 	c.Window = a.NewWindow("Smart Calculator (c) acristin")
 	c.Window.SetContent(container.NewGridWithColumns(1,
@@ -204,8 +198,10 @@ func (c *Calc) LoadUI(a fyne.App) {
 			c.charButton('e'),
 			equals,
 			c.addButton("plot", func() {
-				c.checkBorders()
-				plot.ShowPlot(a, c.Equation, plot.Borders(c.Border))
+				if c.Equation != "error" {
+					c.checkBorders()
+					plot.ShowPlot(a, c.Equation, plot.Borders(c.Border))
+				}
 			}),
 			c.addEntry("y max", func(s string) { c.changeXValue(s, &c.Border.YMax) })),
 	))
@@ -218,23 +214,21 @@ func (c *Calc) LoadUI(a fyne.App) {
 	// handle ESC, Return, Enter, BackSpace
 	c.Window.Canvas().SetOnTypedKey(func(keyEvent *fyne.KeyEvent) {
 		if keyEvent.Name == fyne.KeyEscape || keyEvent.Name == "W" {
+			log.Println("app: quit ...")
 			a.Quit()
 		} else if keyEvent.Name == fyne.KeyReturn || keyEvent.Name == fyne.KeyEnter {
 			c.evaluate()
 		} else if keyEvent.Name == fyne.KeyBackspace {
 			c.backspace()
 		} else if keyEvent.Name == "H" {
-			log.Println("history")
 			history.ShowHistory(a)
 			operation := history.GetHistoryItem()
 			if len(operation) != 0 {
 				c.display(operation)
 			}
 		} else if keyEvent.Name == "A" {
-			log.Println("about")
 			about.ShowAbout(a)
 		} else if keyEvent.Name == "P" {
-			log.Println("plot")
 			c.checkBorders()
 			plot.ShowPlot(a, c.Equation, plot.Borders(c.Border))
 		}
@@ -244,15 +238,14 @@ func (c *Calc) LoadUI(a fyne.App) {
 
 	// add menu
 	fileMenu := fyne.NewMenu("Calculator Menu",
-		fyne.NewMenuItem("About", func() {
-			log.Println("about")
-			about.ShowAbout(a)
+		fyne.NewMenuItem("About", func() { about.ShowAbout(a) }),
+		fyne.NewMenuItem("Quit", func() {
+			log.Println("app: quit ...")
+			a.Quit()
 		}),
-		fyne.NewMenuItem("Quit", func() { a.Quit() }),
 	)
 	historyMenu := fyne.NewMenu("History",
 		fyne.NewMenuItem("Show", func() {
-			log.Println("history")
 			history.ShowHistory(a)
 			operation := history.GetHistoryItem()
 			if len(operation) != 0 {

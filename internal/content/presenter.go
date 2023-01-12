@@ -13,9 +13,9 @@ func (c *Calc) clear() {
 func (c *Calc) evaluate() {
 	var historyText = c.Output.Text + "="
 	c.ifEqualPressed = true
-	log.Println(c.Output.Text)
 	result := math.Calculate(c.Output.Text, c.XValue)
 	historyText += result
 	history.UpdateHistory(historyText)
 	c.display(result)
+	log.Println(historyText)
 }

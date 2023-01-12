@@ -10,6 +10,7 @@ import (
 	"github.com/ajstarks/fc/chart"
 	"image/color"
 	"io"
+	"log"
 	"os"
 	"strconv"
 )
@@ -53,23 +54,26 @@ func ShowPlot(a fyne.App, equation string, border Borders) {
 	var input io.Reader
 	var ferr error
 	if border.XMin == 0 && border.XMax == 0 && border.YMin == 0 && border.YMax == 0 {
+		log.Println("plot: non valid borders")
 		return
 	}
+	log.Println("plot: opened")
 
 	border.YMin, border.YMax = UpdateData(equation, border.XMin, border.XMax, border.YMin, border.YMax)
 	// Read from specified file
 	input, ferr = os.Open("../assets/data.d")
 	if ferr != nil {
-		fmt.Fprintf(os.Stderr, "%v\n", ferr)
-		os.Exit(1)
+		log.Println("plot: data file open error")
+		return
 	}
 
 	// Read in the data
 	plot, err := chart.DataRead(input)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "%v\n", err)
-		os.Exit(2)
+		log.Println("plot: data file read error")
+		return
 	}
+	log.Println("plot:", plot.Title)
 
 	// Define the field
 	w, h := 600, 600
@@ -101,17 +105,17 @@ func ShowPlot(a fyne.App, equation string, border Borders) {
 	// Draw labels, axes if specified
 	plot.Color = labelcolor
 	plot.Label(field, 1.5, 5)
-	plot.YAxis(field, 1.5, border.YMin, border.YMax, (border.YMax-border.YMin)/10, "%.2f", true)
+	plot.YAxis(field, 1.5, border.YMin, border.YMax, (border.YMax-border.YMin)/20, "%.2f", true)
 
 	field.Window.Canvas().SetOnTypedKey(func(keyEvent *fyne.KeyEvent) {
 		if keyEvent.Name == fyne.KeyEscape || keyEvent.Name == "W" {
 			field.Window.Close()
+			log.Println("plot: closed")
 		}
 	})
 
 	// Show the plot
 	field.Window.Resize(fyne.NewSize(600, 600))
-	field.Window.SetFixedSize(true)
 	field.Window.SetPadded(false)
 	field.Window.SetContent(field.Container)
 	field.Window.Show()

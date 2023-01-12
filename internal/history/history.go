@@ -14,6 +14,7 @@ var wasShown = false
 
 func ClearHistory() {
 	file.Clear("../assets/log.txt")
+	log.Println("history: cleaned")
 }
 
 func GetHistory() string {
@@ -39,6 +40,7 @@ func saveHistoryItem(content string) {
 }
 
 func ShowHistory(a fyne.App) {
+	log.Println("history: opened")
 	w2 := a.NewWindow("History")
 	var btns []fyne.CanvasObject
 	file := GetHistory()
@@ -46,7 +48,7 @@ func ShowHistory(a fyne.App) {
 		line := line
 		if len(line) != 0 {
 			btns = append(btns, widget.NewButton(line, func() {
-				log.Println(line)
+				log.Println("operation", line, "was chosen from history")
 				saveHistoryItem(line)
 				wasShown = true
 				w2.Close()
@@ -66,6 +68,7 @@ func ShowHistory(a fyne.App) {
 		if keyEvent.Name == fyne.KeyEscape || keyEvent.Name == "W" {
 			wasShown = true
 			w2.Close()
+			log.Println("history: closed")
 		} else if keyEvent.Name == fyne.KeyBackspace {
 			ClearHistory()
 			wasShown = true
