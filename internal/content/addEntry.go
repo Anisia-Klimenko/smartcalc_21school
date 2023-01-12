@@ -10,6 +10,14 @@ func (c *Calc) changeXValue(s string, val *float64) {
 	*val, _ = strconv.ParseFloat(s, 64)
 }
 
+// changeBorderValue convert entry input s to float64 and saves it in val
+func (c *Calc) changeBorderValue(s string, val *float64, isSet *bool) {
+	if len(s) > 0 {
+		*isSet = true
+	}
+	*val, _ = strconv.ParseFloat(s, 64)
+}
+
 // addEntry creates a new single line entry widget with the set label
 // and onchange handler.
 func (c *Calc) addEntry(label string, handler func(string)) *widget.Entry {

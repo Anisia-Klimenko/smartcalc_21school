@@ -18,10 +18,19 @@ type Borders struct {
 	YMax float64
 }
 
+// IsBorderSet indicates if borders for plot set
+type IsBorderSet struct {
+	XMin bool
+	XMax bool
+	YMin bool
+	YMax bool
+}
+
 type Calc struct {
 	Equation       string
 	XValue         float64
 	Border         Borders
+	IsBorderSet    IsBorderSet
 	Output         *widget.Label
 	Buttons        map[string]*widget.Button
 	Entries        map[string]*widget.Entry
@@ -69,7 +78,7 @@ func (c *Calc) LoadUI(a fyne.App) {
 			c.stringButton("mod"),
 			c.stringButton("sin"),
 			c.stringButton("asin"),
-			c.addEntry("x min", func(s string) { c.changeXValue(s, &c.Border.XMin) })),
+			c.addEntry("x min", func(s string) { c.changeBorderValue(s, &c.Border.XMin, &c.IsBorderSet.XMin) })),
 		container.NewGridWithColumns(8,
 			c.digitButton(4),
 			c.digitButton(5),
@@ -78,7 +87,7 @@ func (c *Calc) LoadUI(a fyne.App) {
 			c.stringButton("ln"),
 			c.stringButton("cos"),
 			c.stringButton("acos"),
-			c.addEntry("x max", func(s string) { c.changeXValue(s, &c.Border.XMax) })),
+			c.addEntry("x max", func(s string) { c.changeBorderValue(s, &c.Border.XMax, &c.IsBorderSet.XMax) })),
 		container.NewGridWithColumns(8,
 			c.digitButton(1),
 			c.digitButton(2),
@@ -87,7 +96,7 @@ func (c *Calc) LoadUI(a fyne.App) {
 			c.stringButton("log"),
 			c.stringButton("tan"),
 			c.stringButton("atan"),
-			c.addEntry("y min", func(s string) { c.changeXValue(s, &c.Border.YMin) })),
+			c.addEntry("y min", func(s string) { c.changeBorderValue(s, &c.Border.YMin, &c.IsBorderSet.YMin) })),
 		container.NewGridWithColumns(8,
 			c.digitButton(0),
 			c.charButton('.'),
@@ -97,11 +106,12 @@ func (c *Calc) LoadUI(a fyne.App) {
 			equals,
 			c.addButton("plot", func() {
 				if c.Equation != "error" {
-					c.checkBorders()
-					plot.ShowPlot(a, c.Equation, plot.Borders(c.Border))
+					if c.checkBorders() {
+						plot.ShowPlot(a, c.Equation, plot.Borders(c.Border))
+					}
 				}
 			}),
-			c.addEntry("y max", func(s string) { c.changeXValue(s, &c.Border.YMax) })),
+			c.addEntry("y max", func(s string) { c.changeBorderValue(s, &c.Border.YMax, &c.IsBorderSet.YMax) })),
 	))
 
 	canvas := c.Window.Canvas()
@@ -136,8 +146,9 @@ func (c *Calc) LoadUI(a fyne.App) {
 			about.ShowAbout(a)
 		} else if keyEvent.Name == "P" {
 			// Build plot in case P was pressed
-			c.checkBorders()
-			plot.ShowPlot(a, c.Equation, plot.Borders(c.Border))
+			if c.checkBorders() {
+				plot.ShowPlot(a, c.Equation, plot.Borders(c.Border))
+			}
 		}
 	})
 

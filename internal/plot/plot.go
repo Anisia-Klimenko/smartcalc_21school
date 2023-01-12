@@ -63,9 +63,9 @@ func UpdateData(equation string, xMin, xMax, yMin, yMax float64) (float64, float
 func ShowPlot(a fyne.App, equation string, border Borders) {
 	var input io.Reader
 	var ferr error
-	// Handle non-valid borders
-	if border.XMin == 0 && border.XMax == 0 && border.YMin == 0 && border.YMax == 0 {
-		log.Println("plot: non valid borders")
+	// Handle empty equation
+	if len(equation) == 0 {
+		log.Println("plot: empty equation")
 		return
 	}
 	log.Println("plot: opened")
