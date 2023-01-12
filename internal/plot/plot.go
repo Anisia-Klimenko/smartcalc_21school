@@ -21,7 +21,8 @@ type Borders struct {
 	YMax float64
 }
 
-func UpdateData(equation string, xMin, xMax, yMin, yMax float64) {
+func UpdateData(equation string, xMin, xMax, yMin, yMax float64) (float64, float64) {
+	var newMin, newMax = yMax, yMin
 	dataFile := "../assets/data.d"
 	file.Clear(dataFile)
 	file.Update(dataFile, "# y="+equation)
@@ -29,25 +30,33 @@ func UpdateData(equation string, xMin, xMax, yMin, yMax float64) {
 	for i := xMin; i < xMax; i += delta {
 		result, err := strconv.ParseFloat(math.Calculate(equation, i), 64)
 		if err == nil {
-			file.Update(dataFile, fmt.Sprintf("%.2f\t%.4f", i, result))
+			if result > yMax {
+				result = yMax
+			} else if result < yMin {
+				result = yMin
+			}
+			if result > newMax {
+				newMax = result
+			}
+			if result < newMin {
+				newMin = result
+			}
+			if result == result {
+				file.Update(dataFile, fmt.Sprintf("%.2f\t%.7f", i, result))
+			}
 		}
 	}
+	return newMin, newMax
 }
 
 func ShowPlot(a fyne.App, equation string, border Borders) {
 	var input io.Reader
 	var ferr error
-	equation = "2*x"
-	border.XMin = -10
-	border.XMax = 10
-	border.YMin = -10
-	border.YMax = 10
 	if border.XMin == 0 && border.XMax == 0 && border.YMin == 0 && border.YMax == 0 {
 		return
 	}
 
-	UpdateData(equation, border.XMin, border.XMax, border.YMin, border.YMax)
-
+	border.YMin, border.YMax = UpdateData(equation, border.XMin, border.XMax, border.YMin, border.YMax)
 	// Read from specified file
 	input, ferr = os.Open("../assets/data.d")
 	if ferr != nil {
@@ -85,7 +94,7 @@ func ShowPlot(a fyne.App, equation string, border Borders) {
 	// Draw the data
 	plot.Color = datacolor
 	//plot.Frame(field, 10)
-	plot.Line(field, 0.4)
+	plot.Line(field, 0.25)
 	plot.Bar(field, 0.25)
 	plot.Scatter(field, 0.25)
 

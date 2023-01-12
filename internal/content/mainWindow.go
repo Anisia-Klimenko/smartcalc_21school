@@ -130,6 +130,14 @@ func isInLimits(val float64) bool {
 }
 
 func (c *Calc) checkBorders() {
+	if c.Border.XMin == 0 && c.Border.XMax == 0 {
+		c.Border.XMin = -10
+		c.Border.XMax = 10
+	}
+	if c.Border.YMin == 0 && c.Border.YMax == 0 {
+		c.Border.YMin = -1000000
+		c.Border.YMax = 1000000
+	}
 	if c.Border.XMin >= c.Border.XMax || c.Border.YMin >= c.Border.YMax ||
 		!isInLimits(c.Border.XMin) || !isInLimits(c.Border.XMax) ||
 		!isInLimits(c.Border.YMin) || !isInLimits(c.Border.YMax) {
