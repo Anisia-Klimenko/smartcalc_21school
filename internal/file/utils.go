@@ -1,44 +1,30 @@
 package file
 
 import (
-	"log"
 	"os"
 )
 
 // Update adds new line with content to file fileName
 func Update(fileName string, content string) {
-	f, err := os.OpenFile(fileName, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
-	if err != nil {
-		log.Println(err)
-	}
-
+	f, _ := os.OpenFile(fileName, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
 	defer f.Close()
-
-	if _, err = f.WriteString(content + "\n"); err != nil {
-		log.Println(err)
-	}
+	f.WriteString(content + "\n")
 }
 
 // Rewrite truncates file fileName when opened and writes new line with
 // content string
 func Rewrite(fileName string, content string) {
-	f, err := os.OpenFile(fileName, os.O_TRUNC|os.O_WRONLY|os.O_CREATE, 0600)
-	if err != nil {
-		log.Println(err)
-	}
-
+	f, _ := os.OpenFile(fileName, os.O_TRUNC|os.O_WRONLY|os.O_CREATE, 0600)
 	defer f.Close()
-
-	if _, err = f.WriteString(content + "\n"); err != nil {
-		log.Println(err)
-	}
+	f.WriteString(content + "\n")
 }
 
 // Clear clears file fileName
 func Clear(fileName string) {
-	f, err := os.OpenFile(fileName, os.O_WRONLY|os.O_CREATE, 0600)
+	f, err := os.OpenFile(fileName, os.O_WRONLY, 0600)
 	if err != nil {
-		log.Println(err)
+		//log.Println(err)
+		return
 	}
 
 	defer f.Close()
@@ -49,6 +35,9 @@ func Clear(fileName string) {
 
 // Content returns content of file fileName
 func Content(fileName string) string {
-	result, _ := os.ReadFile(fileName)
+	result, err := os.ReadFile(fileName)
+	if err != nil {
+		return ""
+	}
 	return string(result)
 }
