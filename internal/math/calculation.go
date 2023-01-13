@@ -72,6 +72,8 @@ func calculateFunc(function string, operand float64) (float64, error) {
 		result = math.Log(operand)
 	case "log":
 		result = math.Log10(operand)
+	default:
+		return 0.0, fmt.Errorf("invalid operator")
 	}
 	return result, nil
 }

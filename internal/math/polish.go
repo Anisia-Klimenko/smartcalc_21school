@@ -6,8 +6,13 @@ import (
 )
 
 // all operators and functions
+var opfuncs = []string{
+	"+", "-", "*", "/", "^", "mod", "e", "sqrt", "sin", "asin", "cos", "acos", "tan", "atan", "ln", "log",
+}
+
+// all operators
 var operators = []string{
-	"+", "-", "*", "/", "^", "mod", "sqrt", "sin", "asin", "cos", "acos", "tan", "atan", "ln", "log", "e",
+	"+", "-", "*", "/", "^", "mod", "e",
 }
 
 // all functions
@@ -42,11 +47,21 @@ func precedence(s string) int {
 		return 3
 	} else if s == "/" || s == "*" || s == "mod" {
 		return 2
-	} else if s == "++" || s == "--" || s == "+" || s == "-" {
+	} else if s == "+" || s == "-" {
 		return 1
 	} else {
 		return -1
 	}
+}
+
+// isOperator checks if input is a function
+func isOperator(input string) bool {
+	for _, f := range operators {
+		if input == f {
+			return true
+		}
+	}
+	return false
 }
 
 // isFunction checks if input is a function
@@ -62,7 +77,7 @@ func isFunction(input string) bool {
 // isDigit checks if input is a digit
 func isDigit(input string) bool {
 	_, err := strconv.ParseFloat(input, 64)
-	if err != nil {
+	if err != nil || len(input) == 0 {
 		return false
 	}
 	return true
@@ -115,16 +130,20 @@ func infixToPostfix(infix string) (postfix Stack) {
 func splitLex(input string) (res Stack) {
 	var digit string
 	var ind = 0
+	var sign = 1
 	for range input {
 		if ind >= len(input) {
 			break
 		}
 		if input[ind] == '(' || input[ind] == ')' || input[ind] == 'x' || input[ind] == 'e' {
+			// "(", ")", "x", "e" - separate symbols
 			res.Push(string(input[ind]))
 			ind++
 		} else {
+			// Check if digit
 			_, err := strconv.Atoi(string(input[ind]))
 			for err == nil || input[ind] == '.' {
+				// Write whole number
 				digit += string(input[ind])
 				ind++
 				if len(input[ind:]) > 0 {
@@ -133,14 +152,37 @@ func splitLex(input string) (res Stack) {
 					break
 				}
 			}
+			// If input is digit
 			if len(digit) > 0 {
+				// If unary minus
+				if sign < 0 {
+					digit = "-" + digit
+					sign = 1
+				}
 				res.Push(digit)
 				digit = ""
+			} else if sign < 0 {
+				// There is no number before minus, so this operator is not unary
+				res.Push("-")
+				sign = 1
 			}
 			if ind < len(input) {
-				for _, op := range operators {
+				// Check if input is operator or function
+				for _, op := range opfuncs {
 					if strings.HasPrefix(input[ind:], op) {
-						res.Push(op)
+						// Operator is unary, if:
+						// 1. it is the first symbol
+						// 2. there is one more operator before
+						// 3. there is "(" before
+						if op == "-" && (res.IsEmpty() || isOperator(res.Top()) || res.Top() == "(") {
+							// Change sign of digit if there is unary minus
+							sign = -1
+						} else if op == "+" && (res.IsEmpty() || isOperator(res.Top()) || res.Top() == "(") {
+							// Do nothing if there is unary plus
+						} else {
+							// Add operator to result otherwise
+							res.Push(op)
+						}
 						ind += len(op)
 						break
 					}

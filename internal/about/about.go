@@ -8,9 +8,11 @@ import (
 	"log"
 )
 
+var Path = "../assets/about.txt"
+
 // getAbout reads file with reference and return content in string format
 func getAbout() string {
-	about := file.Content("../assets/about.txt")
+	about := file.Content(Path)
 	// In case content is missing
 	if len(about) == 0 {
 		return "Content is missing"
