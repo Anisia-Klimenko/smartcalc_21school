@@ -22,10 +22,16 @@ type Borders struct {
 	YMax float64
 }
 
+var dataFile = "../assets/data.d"
+
+// UpdatePath updates path if app was installed as desktop app
+func UpdatePath(newPath string) {
+	dataFile = newPath + "/assets/data.d"
+}
+
 // UpdateData generates data file for plotting
 func UpdateData(equation string, xMin, xMax, yMin, yMax float64) (float64, float64) {
 	var newMin, newMax = yMax, yMin
-	dataFile := "../assets/data.d"
 
 	// Clear file before writing
 	file.Clear(dataFile)
@@ -84,7 +90,7 @@ func ShowPlot(a fyne.App, equation string, border Borders) {
 	log.Println("plot: grade borders: [", border.XMin, ";", border.XMax, "] [", border.YMin, ";", border.YMax, "]")
 
 	// Read from specified file
-	input, ferr = os.Open("../assets/data.d")
+	input, ferr = os.Open(dataFile)
 	if ferr != nil {
 		log.Println("plot: data file open error")
 		return

@@ -10,6 +10,7 @@ import (
 
 var path = "../assets/about.txt"
 
+// UpdatePath updates path if app was installed as desktop app
 func UpdatePath(newPath string) {
 	path = newPath + "/assets/about.txt"
 }

@@ -18,6 +18,7 @@ var wasShown = false
 var path = "../assets/log.txt"
 var itemPath = "../assets/item.txt"
 
+// UpdatePaths updates path if app was installed as desktop app
 func UpdatePaths(newPath string) {
 	path = newPath + "/assets/log.txt"
 	itemPath = newPath + "/assets/item.txt"
