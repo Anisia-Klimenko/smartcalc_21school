@@ -4,15 +4,12 @@ import "log"
 
 // isInLimits checks if val is in [-1000000; 1000000]
 func isInLimits(val float64) bool {
-	if val >= -1000000 && val <= 1000000 {
-		return true
-	}
-	return false
+	return val >= -1000000 && val <= 1000000
 }
 
 // checkBorders checks if borders are valid and if not changes them to default
 // valid values
-func (c *Calc) checkBorders() bool {
+func (c *Calc) checkBorders() (ifValid bool) {
 	// x min border is not set
 	if !c.IsBorderSet.XMin {
 		c.Border.XMin = -10
@@ -30,6 +27,7 @@ func (c *Calc) checkBorders() bool {
 		c.Border.YMax = 30
 	}
 
+	ifValid = true
 	log.Println("plot: borders: [", c.Border.XMin, ";", c.Border.XMax, "] [", c.Border.YMin, ";", c.Border.YMax, "]")
 
 	// non-valid borders
@@ -42,7 +40,7 @@ func (c *Calc) checkBorders() bool {
 		c.Border.XMax = 0
 		c.Border.YMax = 0
 		c.display("non-valid borders")
-		return false
+		ifValid = false
 	}
-	return true
+	return
 }

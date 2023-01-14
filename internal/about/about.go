@@ -15,7 +15,7 @@ func getAbout() string {
 	about := file.Content(path)
 	// In case content is missing
 	if len(about) == 0 {
-		return "Content is missing"
+		about = "Content is missing"
 	}
 	return about
 }

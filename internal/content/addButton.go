@@ -40,9 +40,11 @@ func (c *Calc) charButton(char rune) *widget.Button {
 
 // stringButton returns new button with the label set as str
 func (c *Calc) stringButton(str string) *widget.Button {
-	// mod is a separate case because it works like an operator
+	var button *widget.Button
+
 	if str == "mod" {
-		return c.addButton(str, func() {
+		// mod is a separate case because it works like an operator
+		button = c.addButton(str, func() {
 			// Clear output in case of new expression
 			if c.ifEqualPressed || c.Output.Text == "error" {
 				c.clear()
@@ -50,14 +52,17 @@ func (c *Calc) stringButton(str string) *widget.Button {
 			}
 			c.string(str)
 		})
+	} else {
+		// Add "(" to output if function button is pressed
+		button = c.addButton(str, func() {
+			// Clear output in case of new expression
+			if c.ifEqualPressed || c.Output.Text == "error" {
+				c.clear()
+				c.ifEqualPressed = false
+			}
+			c.string(str + "(")
+		})
 	}
-	// Add "(" to output if function button is pressed
-	return c.addButton(str, func() {
-		// Clear output in case of new expression
-		if c.ifEqualPressed || c.Output.Text == "error" {
-			c.clear()
-			c.ifEqualPressed = false
-		}
-		c.string(str + "(")
-	})
+
+	return button
 }

@@ -9,7 +9,7 @@ import (
 
 // backspace removes last typed symbol
 func (c *Calc) backspace() {
-	if len(c.Equation) == 0 {
+	if len(c.Equation) == 0 || c.Equation == "error" {
 		// Empty equation
 		return
 	} else if c.Equation == "error" {
