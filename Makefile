@@ -4,3 +4,6 @@ all:
 test:
 	@cd internal/file; go test -coverprofile cover.out; rm cover.out
 	@cd internal/math; go test -coverprofile cover.out; rm cover.out
+
+install:
+	@sh scripts/install.sh

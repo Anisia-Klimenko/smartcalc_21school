@@ -10,12 +10,16 @@ import (
 
 var path = "../assets/about.txt"
 
+func UpdatePath(newPath string) {
+	path = newPath + "/assets/about.txt"
+}
+
 // getAbout reads file with reference and return content in string format
 func getAbout() string {
 	about := file.Content(path)
 	// In case content is missing
 	if len(about) == 0 {
-		about = "Content is missing"
+		about = "Content is missing " + path
 	}
 	return about
 }

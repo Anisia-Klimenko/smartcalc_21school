@@ -18,6 +18,11 @@ var wasShown = false
 var path = "../assets/log.txt"
 var itemPath = "../assets/item.txt"
 
+func UpdatePaths(newPath string) {
+	path = newPath + "/assets/log.txt"
+	itemPath = newPath + "/assets/item.txt"
+}
+
 // ClearHistory clears history file
 func ClearHistory() {
 	err := file.Clear(path)
