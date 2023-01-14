@@ -13,17 +13,19 @@ func isInLimits(val float64) bool {
 // checkBorders checks if borders are valid and if not changes them to default
 // valid values
 func (c *Calc) checkBorders() bool {
-	// x borders are not set
+	// x min border is not set
 	if !c.IsBorderSet.XMin {
 		c.Border.XMin = -10
 	}
+	// x max border is not set
 	if !c.IsBorderSet.XMax {
 		c.Border.XMax = 10
 	}
-	// y borders are not set
+	// y min border is not set
 	if !c.IsBorderSet.YMin {
 		c.Border.YMin = -30
 	}
+	// y max border is not set
 	if !c.IsBorderSet.YMax {
 		c.Border.YMax = 30
 	}

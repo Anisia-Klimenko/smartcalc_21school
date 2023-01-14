@@ -18,7 +18,8 @@ type Borders struct {
 	YMax float64
 }
 
-// IsBorderSet indicates if borders for plot set
+// IsBorderSet indicates if borders for plot set. These flags help distinguish
+// between the cases where the input is 0 and when the input is empty.
 type IsBorderSet struct {
 	XMin bool
 	XMax bool
@@ -47,7 +48,7 @@ func NewCalculator(a fyne.App) *Calc {
 	}
 }
 
-// LoadUI creates main window, interface and menu, calls handlers
+// LoadUI creates main window, its interface and menu items, calls handlers
 func (c *Calc) LoadUI(a fyne.App) {
 	log.Println("app: start ...")
 
@@ -62,7 +63,9 @@ func (c *Calc) LoadUI(a fyne.App) {
 	// Create main window and set content
 	c.Window = a.NewWindow("Smart Calculator (c) acristin")
 	c.Window.SetContent(container.NewGridWithColumns(1,
+		// Output field should be scrollable to accommodate 255 symbols
 		container.NewHScroll(c.Output),
+		// Table with buttons and entries
 		container.NewGridWithColumns(8,
 			c.addButton("C", c.clear),
 			c.charButton('('),

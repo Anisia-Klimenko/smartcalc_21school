@@ -6,7 +6,7 @@ import (
 )
 
 // addButton creates a new button widget with the set label and tap handler.
-// Also adds new button to c.Buttons[]
+// Also sets new button as calculator object slice field element
 func (c *Calc) addButton(label string, handler func()) *widget.Button {
 	button := widget.NewButton(label, handler)
 	c.Buttons[label] = button
@@ -38,26 +38,26 @@ func (c *Calc) charButton(char rune) *widget.Button {
 	})
 }
 
-// stringButton returns new button with the label set as s
-func (c *Calc) stringButton(s string) *widget.Button {
+// stringButton returns new button with the label set as str
+func (c *Calc) stringButton(str string) *widget.Button {
 	// mod is a separate case because it works like an operator
-	if s == "mod" {
-		return c.addButton(s, func() {
+	if str == "mod" {
+		return c.addButton(str, func() {
 			// Clear output in case of new expression
 			if c.ifEqualPressed || c.Output.Text == "error" {
 				c.clear()
 				c.ifEqualPressed = false
 			}
-			c.string(s)
+			c.string(str)
 		})
 	}
 	// Add "(" to output if function button is pressed
-	return c.addButton(s, func() {
+	return c.addButton(str, func() {
 		// Clear output in case of new expression
 		if c.ifEqualPressed || c.Output.Text == "error" {
 			c.clear()
 			c.ifEqualPressed = false
 		}
-		c.string(s + "(")
+		c.string(str + "(")
 	})
 }

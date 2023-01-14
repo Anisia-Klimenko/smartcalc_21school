@@ -6,9 +6,13 @@ import (
 	"strconv"
 )
 
-// evaluatePostfix calculates the value of an expression using README algorithm
+// evaluatePostfix calculates the value of an expression exp in postfix notation, and sets
+// x value to xVal. Function is using README algorithm.
 func evaluatePostfix(exp Stack, xVal float64) (float64, error) {
+	// operands stack contains operands from exp, the number of operands and their values
+	// changes during loop, the last remaining element in stack is the result of the expression
 	operands := new(StackFloat)
+	// calculated is current result of calculation operator or function
 	var calculated float64
 	var err error
 	for _, elem := range exp {

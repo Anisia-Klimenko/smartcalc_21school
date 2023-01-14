@@ -8,11 +8,11 @@ import (
 	"log"
 )
 
-var Path = "../assets/about.txt"
+var path = "../assets/about.txt"
 
 // getAbout reads file with reference and return content in string format
 func getAbout() string {
-	about := file.Content(Path)
+	about := file.Content(path)
 	// In case content is missing
 	if len(about) == 0 {
 		return "Content is missing"
@@ -23,6 +23,8 @@ func getAbout() string {
 // ShowAbout opens window with reference
 func ShowAbout(a fyne.App) {
 	log.Println("about: opened")
+
+	// Create window and set content from file
 	w3 := a.NewWindow("About")
 	about := getAbout() // Get content from file
 	w3.SetContent(container.NewGridWithColumns(1,

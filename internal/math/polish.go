@@ -24,6 +24,7 @@ var functions = []string{
 func Calculate(input string, xVal float64) (result string) {
 	// Convert infix notation to postfix
 	output := infixToPostfix(input)
+	// Checks result of conversion (left for evaluation)
 	//fmt.Println(output)
 
 	// Evaluate expression
@@ -41,7 +42,8 @@ func Calculate(input string, xVal float64) (result string) {
 	return
 }
 
-// precedence returns precedence of operators
+// precedence returns precedence of operators, 3 means that this operation calculates
+// earlier than 1, returns -1 in case of error
 func precedence(s string) int {
 	if s == "^" || isFunction(s) || s == "e" {
 		return 3
@@ -87,6 +89,7 @@ func isDigit(input string) bool {
 func infixToPostfix(infix string) (postfix Stack) {
 	// Split input into lexemes
 	inputLex := splitLex(infix)
+	// sta is a buffer stack to save functions, operators, braces
 	var sta Stack
 	for _, s := range inputLex {
 		if isDigit(s) {
@@ -126,7 +129,7 @@ func infixToPostfix(infix string) (postfix Stack) {
 	return
 }
 
-// splitLex splits input into lexemes and returns result as Stack
+// splitLex splits input string into lexemes and returns result as Stack
 func splitLex(input string) (res Stack) {
 	var digit string
 	var ind = 0

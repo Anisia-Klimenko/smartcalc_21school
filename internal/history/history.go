@@ -10,22 +10,28 @@ import (
 	"strings"
 )
 
+// Flag that helps wait until equation from history is chosen
+// or history window is closed
 var wasShown = false
+
+// Paths to files
+var path = "../assets/log.txt"
+var itemPath = "../assets/item.txt"
 
 // ClearHistory clears history file
 func ClearHistory() {
-	file.Clear("../assets/log.txt")
+	file.Clear(path)
 	log.Println("history: cleaned")
 }
 
 // GetHistory returns content of history file
 func GetHistory() string {
-	return file.Content("../assets/log.txt")
+	return file.Content(path)
 }
 
 // UpdateHistory adds content to history file
 func UpdateHistory(content string) {
-	file.Update("../assets/log.txt", content)
+	file.Update(path, content)
 }
 
 // GetHistoryItem reads chosen equation from file
@@ -33,8 +39,8 @@ func GetHistoryItem() string {
 	// History window's not closed yet, so equation's not chosen too
 	for !wasShown {
 	}
-	result, _ := os.ReadFile("../assets/item.txt")
-	file.Clear("../assets/item.txt")
+	result, _ := os.ReadFile(itemPath)
+	file.Clear(itemPath)
 	res := strings.Split(string(result), "=")[0]
 	wasShown = false
 	return res
@@ -42,7 +48,7 @@ func GetHistoryItem() string {
 
 // saveHistoryItem saves chosen equation to file
 func saveHistoryItem(equation string) {
-	file.Rewrite("../assets/item.txt", equation)
+	file.Rewrite(itemPath, equation)
 }
 
 // ShowHistory opens window with operation history
