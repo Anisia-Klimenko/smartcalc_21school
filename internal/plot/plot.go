@@ -57,6 +57,15 @@ func UpdateData(equation string, xMin, xMax, yMin, yMax float64) (float64, float
 			}
 		}
 	}
+	if newMax == newMin {
+		if newMax > 0 {
+			return 0, newMax
+		} else if newMax < 0 {
+			return newMax, 0
+		} else {
+			return -10, 10
+		}
+	}
 	return newMin, newMax
 }
 
@@ -72,6 +81,7 @@ func ShowPlot(a fyne.App, equation string, border Borders) {
 
 	// Generate dataset and save to file, update y-borders
 	border.YMin, border.YMax = UpdateData(equation, border.XMin, border.XMax, border.YMin, border.YMax)
+	log.Println("plot: grade borders: [", border.XMin, ";", border.XMax, "] [", border.YMin, ";", border.YMax, "]")
 
 	// Read from specified file
 	input, ferr = os.Open("../assets/data.d")
