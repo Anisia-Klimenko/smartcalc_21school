@@ -91,8 +91,8 @@ func infixToPostfix(infix string) (postfix Stack) {
 	for _, s := range inputLex {
 		if isDigit(s) {
 			postfix.Push(s)
-		} else if s == "x" {
-			postfix.Push("x")
+		} else if s == "x" || s == "-x" {
+			postfix.Push(s)
 		} else if s == "(" || isFunction(s) {
 			sta.Push(s)
 		} else if s == ")" {
@@ -139,6 +139,9 @@ func splitLex(input string) (res Stack) {
 			// "(", ")", "x", "e" - separate symbols
 			res.Push(string(input[ind]))
 			ind++
+		} else if len(input[ind:]) > 1 && input[ind:ind+2] == "-x" {
+			res.Push("-x")
+			ind += 2
 		} else {
 			// Check if digit
 			_, err := strconv.Atoi(string(input[ind]))

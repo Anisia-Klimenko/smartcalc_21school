@@ -14,14 +14,14 @@ func evaluatePostfix(exp Stack, xVal float64) (float64, error) {
 	for _, elem := range exp {
 		if isDigit(elem) {
 			// If there is a number on the stack, move it to the operands
-			op, err := strconv.ParseFloat(elem, 64)
-			if err != nil {
-				return 0.0, err
-			}
+			op, _ := strconv.ParseFloat(elem, 64)
 			operands.Push(op)
 		} else if elem == "x" {
 			// If there is x on the stack, move its value to the operands
 			operands.Push(xVal)
+		} else if elem == "-x" {
+			// If there is negative x on the stack, move its negative value to the operands
+			operands.Push(-xVal)
 		} else {
 			if isFunction(elem) {
 				// If there is a function on the stack, take the last operand

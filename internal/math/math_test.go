@@ -16,7 +16,9 @@ func TestCalculate(t *testing.T) {
 		args       args
 		wantResult string
 	}{
-		// TODO: Add test cases.
+		{name: "empty", args: args{input: "", xVal: 0}, wantResult: "0"},
+		{name: "error )", args: args{input: "sqrt(4", xVal: 0}, wantResult: "error"},
+		{name: "1/3", args: args{input: "1/3", xVal: 0}, wantResult: "0.3333333"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -285,7 +287,19 @@ func Test_evaluatePostfix(t *testing.T) {
 		want    float64
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{name: "empty0", args: args{exp: Stack{}, xVal: 0}, want: 0, wantErr: false},
+		{name: "empty1", args: args{exp: Stack{}, xVal: 1}, want: 0, wantErr: false},
+		{name: "1", args: args{exp: Stack{"1"}, xVal: 0}, want: 1, wantErr: false},
+		{name: "-1", args: args{exp: Stack{"-1"}, xVal: 0}, want: -1, wantErr: false},
+		{name: "+1", args: args{exp: Stack{"1"}, xVal: 0}, want: 1, wantErr: false},
+		{name: "1+2", args: args{exp: Stack{"1", "2", "+"}, xVal: 0}, want: 3, wantErr: false},
+		{name: "1+-2", args: args{exp: Stack{"1", "-2", "+"}, xVal: 0}, want: -1, wantErr: false},
+		{name: "1-+2", args: args{exp: Stack{"1", "2", "-"}, xVal: 0}, want: -1, wantErr: false},
+		{name: "sin(x)", args: args{exp: Stack{"x", "sin"}, xVal: 0}, want: 0, wantErr: false},
+		{name: "-cos(-x)", args: args{exp: Stack{"-x", "cos", "-"}, xVal: 0}, want: -1, wantErr: false},
+		{name: "-co(-x)", args: args{exp: Stack{"-x", "co", "-"}, xVal: 0}, want: -1, wantErr: true},
+		{name: "-10e2*sin(2/sqrt(4-2)*log(3e2+3^4-6*(4+-5)))", args: args{exp: Stack{"-10", "2", "e", "2", "4", "2", "-", "sqrt", "/", "2", "3", "e", "3", "4", "^", "+", "6", "4", "-5", "+", "*", "-", "log", "*", "sin", "*"}, xVal: 0}, want: 999.8402408588436, wantErr: false},
+		{name: "-10ex*sin(x/sqrt(4-x)*log(3ex+3^4-6*(4+-5)))", args: args{exp: Stack{"-10", "2", "e", "2", "4", "2", "-", "sqrt", "/", "2", "3", "e", "3", "4", "^", "+", "6", "4", "-5", "+", "*", "-", "log", "*", "sin", "*"}, xVal: 2}, want: 999.8402408588436, wantErr: false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -294,7 +308,7 @@ func Test_evaluatePostfix(t *testing.T) {
 				t.Errorf("evaluatePostfix() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if got != tt.want {
+			if got != tt.want && !tt.wantErr {
 				t.Errorf("evaluatePostfix() got = %v, want %v", got, tt.want)
 			}
 		})
@@ -310,11 +324,30 @@ func Test_infixToPostfix(t *testing.T) {
 		args        args
 		wantPostfix Stack
 	}{
-		// TODO: Add test cases.
+		{name: "empty", args: args{infix: ""}, wantPostfix: Stack{}},
+		{name: "1", args: args{infix: "1"}, wantPostfix: Stack{"1"}},
+		{name: "-1", args: args{infix: "-1"}, wantPostfix: Stack{"-1"}},
+		{name: "+1", args: args{infix: "+1"}, wantPostfix: Stack{"1"}},
+		{name: "1+2", args: args{infix: "1+2"}, wantPostfix: Stack{"1", "2", "+"}},
+		{name: "1+-2", args: args{infix: "1+-2"}, wantPostfix: Stack{"1", "-2", "+"}},
+		{name: "1-+2", args: args{infix: "1-+2"}, wantPostfix: Stack{"1", "2", "-"}},
+		{name: "sin(1)", args: args{infix: "sin(1)"}, wantPostfix: Stack{"1", "sin"}},
+		{name: "sin(-1)", args: args{infix: "sin(-1)"}, wantPostfix: Stack{"-1", "sin"}},
+		{name: "-sin(-1)", args: args{infix: "-sin(-1)"}, wantPostfix: Stack{"-1", "sin", "-"}},
+		{name: "sin(-x)", args: args{infix: "sin(-x)"}, wantPostfix: Stack{"-x", "sin"}},
+		{name: "1+2)", args: args{infix: "1+2)"}, wantPostfix: Stack{"error"}},
+		{name: "-10e2*sin(2/sqrt(4-2)*log(2e3+3^4-6*(4+-5)))",
+			args: args{infix: "-10e2*sin(2/sqrt(4-2)*log(2e3+3^4-6*(4+-5)))"},
+			wantPostfix: Stack{"-10", "2", "e", "2", "4", "2", "-", "sqrt", "/", "2", "3", "e", "3",
+				"4", "^", "+", "6", "4", "-5", "+", "*", "-", "log", "*", "sin", "*"}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if gotPostfix := infixToPostfix(tt.args.infix); !reflect.DeepEqual(gotPostfix, tt.wantPostfix) {
+			gotPostfix := infixToPostfix(tt.args.infix)
+			if gotPostfix.IsEmpty() && tt.wantPostfix.IsEmpty() {
+				return
+			}
+			if !reflect.DeepEqual(gotPostfix, tt.wantPostfix) {
 				t.Errorf("infixToPostfix() = %v, want %v", gotPostfix, tt.wantPostfix)
 			}
 		})
@@ -428,6 +461,7 @@ func Test_splitLex(t *testing.T) {
 		{name: "sin(1)", args: args{input: "sin(1)"}, wantRes: Stack{"sin", "(", "1", ")"}},
 		{name: "sin(-1)", args: args{input: "sin(-1)"}, wantRes: Stack{"sin", "(", "-1", ")"}},
 		{name: "-sin(-1)", args: args{input: "-sin(-1)"}, wantRes: Stack{"-", "sin", "(", "-1", ")"}},
+		{name: "sin(-x)", args: args{input: "sin(-x)"}, wantRes: Stack{"sin", "(", "-x", ")"}},
 		{name: "", args: args{input: ""}, wantRes: Stack{}},
 		{name: "-10e2*sin(2/sqrt(4-2)*log(2e3+3^4-6*(4+-5)))", args: args{input: "-10e2*sin(2/sqrt(4-2)*log(2e3+3^4-6*(4+-5)))"},
 			wantRes: Stack{"-10", "e", "2", "*", "sin", "(", "2", "/", "sqrt", "(", "4", "-", "2", ")", "*", "log", "(", "2",
