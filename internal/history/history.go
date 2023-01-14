@@ -20,7 +20,10 @@ var itemPath = "../assets/item.txt"
 
 // ClearHistory clears history file
 func ClearHistory() {
-	file.Clear(path)
+	err := file.Clear(path)
+	if err != nil {
+		log.Println("history: clear: file corrupted")
+	}
 	log.Println("history: cleaned")
 }
 
@@ -31,7 +34,10 @@ func GetHistory() string {
 
 // UpdateHistory adds content to history file
 func UpdateHistory(content string) {
-	file.Update(path, content)
+	err := file.Update(path, content)
+	if err != nil {
+		log.Println("history: update: file corrupted")
+	}
 }
 
 // GetHistoryItem reads chosen equation from file
@@ -40,7 +46,11 @@ func GetHistoryItem() string {
 	for !wasShown {
 	}
 	result, _ := os.ReadFile(itemPath)
-	file.Clear(itemPath)
+	err := file.Clear(itemPath)
+	if err != nil {
+		log.Println("history: clear: file corrupted")
+		return ""
+	}
 	res := strings.Split(string(result), "=")[0]
 	wasShown = false
 	return res
@@ -48,7 +58,11 @@ func GetHistoryItem() string {
 
 // saveHistoryItem saves chosen equation to file
 func saveHistoryItem(equation string) {
-	file.Rewrite(itemPath, equation)
+	err := file.Rewrite(itemPath, equation)
+	if err != nil {
+		log.Println("history: rewrite: file corrupted")
+		return
+	}
 }
 
 // ShowHistory opens window with operation history
