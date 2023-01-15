@@ -9,10 +9,10 @@ echo "$YELLOW Smart Calculator (c) acristin installation$END"
 
 # Ask for installation path
 while true; do
-  read -p " Please enter the installation path: " instPath
+  read -p " Please enter the absolute installation path: " instPath
   case $instPath in
       exit ) exit;;
-      "") echo "$VIOLET Empty path.$END Press exit to exit installation";;
+      "") echo "$VIOLET Empty path.$END Press exit to exit installation.";;
       * ) break;;
   esac
 done
@@ -30,7 +30,7 @@ done
 # Ask for shortcut path if shortcut need to be created
 if [ $ifCreateShortcut == true ]; then
     while true; do
-      read -p " Please enter the shortcut path: " shortcutPath
+      read -p " Please enter the absolute shortcut path: " shortcutPath
       case $shortcutPath in
           "") echo "$VIOLET Empty path$END";;
           * ) break;;
@@ -53,8 +53,14 @@ if [ $ifCreateShortcut == true ]; then
   fi
 fi
 
-# Add package name to instalation path and create directory
+# Add package name to installation path and create directory if not exists
 newInstPath="$instPath/SmartCalc"
+# Check if installation path is correct
+if [ -d "$newInstPath" ]; then
+  echo "$VIOLET Path $newInstPath already exists. Installation stopped.$END"
+  exit
+fi
+
 mkdir -p "$newInstPath"
 
 # Copy all files to the new directory and change current directory
