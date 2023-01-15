@@ -21,35 +21,33 @@ type Credit struct {
 	Message      *widget.Label
 }
 
+// ShowCredit opens window with credit calculator
 func ShowCredit(a fyne.App) {
 	log.Println("credit: opened")
+
+	// Init empty labels
 	var c Credit
 	c.Message = widget.NewLabel("")
 	c.addResultLabels()
-	// Create window and set content from file
+
+	// Create window and set content
 	w4 := a.NewWindow("Credit calculator (c) acristin")
 	w4.SetContent(container.NewGridWithColumns(1,
 		container.NewGridWithColumns(4,
 			c.addLabel("Total loan amount"),
-			c.addEntry("50000", func(s string) {
-				c.Sum = s
-			}),
+			c.addEntry("50000", func(s string) { c.Sum = s }),
 			c.addLabel("Monthly payment"),
 			c.Monthly,
 		),
 		container.NewGridWithColumns(4,
 			c.addLabel("Term"),
-			c.addEntry("12", func(s string) {
-				c.Term = s
-			}),
+			c.addEntry("12", func(s string) { c.Term = s }),
 			c.addLabel("Loan overpayment"),
 			c.Overpay,
 		),
 		container.NewGridWithColumns(4,
 			c.addLabel("Interest rate"),
-			c.addEntry("4.5", func(s string) {
-				c.Rate = s
-			}),
+			c.addEntry("4.5", func(s string) { c.Rate = s }),
 			c.addLabel("Total payment"),
 			c.Total,
 		),
@@ -71,8 +69,10 @@ func ShowCredit(a fyne.App) {
 			// Evaluate equation in case Return or Enter was pressed
 			c.Monthly.Text, c.Overpay.Text, c.Total.Text, c.Err = credit.Calculate(c.Sum, c.Term, c.Rate, c.IsAnnuity)
 			if c.Err != nil {
+				// Update message label
 				c.Message.SetText("error")
 			} else {
+				// Update message and content labels
 				c.Message.SetText("")
 				c.Monthly.SetText(c.Monthly.Text)
 				c.Overpay.SetText(c.Overpay.Text)
