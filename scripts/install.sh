@@ -58,7 +58,7 @@ newInstPath="$instPath/SmartCalc"
 mkdir -p "$newInstPath"
 
 # Copy all files to the new directory and change current directory
-cp -r assets cmd internal scripts go.mod go.sum Makefile README.md "$newInstPath"
+cp -r assets cmd internal go.mod go.sum Makefile README.md "$newInstPath"
 cd "$newInstPath/cmd"
 
 # Run fyne package launcher
