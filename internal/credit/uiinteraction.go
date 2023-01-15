@@ -38,7 +38,11 @@ func (c *Credit) addCalcButton(label string) *widget.Button {
 		}
 
 		// Calculate the results
+		log.Println("credit: parameters: sum =", c.Sum,
+			", term =", c.Term, ", rate =", c.Rate, ", is type annuity =", c.IsAnnuity)
 		c.Monthly.Text, c.Overpay.Text, c.Total.Text, c.Err = credit.Calculate(c.Sum, c.Term, c.Rate, c.IsAnnuity)
+		log.Println("credit: calculated: monthly =", c.Monthly.Text, ", overpay =",
+			c.Overpay.Text, ", total =", c.Total.Text)
 
 		if c.Err != nil {
 			// Set error message label

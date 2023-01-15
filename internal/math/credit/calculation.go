@@ -2,7 +2,6 @@ package credit
 
 import (
 	"errors"
-	"log"
 	"math"
 	"strconv"
 )
@@ -11,8 +10,6 @@ import (
 // for given total loan amount, term, interest rate and type of payment
 // (true for annuity, false for differentiated)
 func Calculate(sum, term, rate string, isAnnuity bool) (monthly, overpay, total string, err error) {
-	log.Println("credit: parameters: sum =", sum, ", term =", term, ", rate =", rate, ", is type annuity =", isAnnuity)
-
 	// Check if passed parameters are valid
 	sumFloat, termFloat, rateFloat, err := validParameters(sum, term, rate)
 	if err != nil {
@@ -38,8 +35,6 @@ func Calculate(sum, term, rate string, isAnnuity bool) (monthly, overpay, total 
 	overpay = strconv.FormatFloat(overpayFloat, 'f', -1, 64)
 	total = strconv.FormatFloat(totalFloat, 'f', -1, 64)
 
-	log.Println("credit: calculated: monthly =", monthly, ", overpay =", overpay, ", total =", total)
-
 	return
 }
 
@@ -63,9 +58,6 @@ func differentiatedPayment(sum, term, rateAnnual float64) (monthly []float64, ov
 	var left float64
 	for i := 0; i < int(term); i++ {
 		left = roundFloat(sum-sum*float64(i)/term, 2)
-		if left <= 0 {
-			break
-		}
 		monthly = append(monthly, roundFloat(sum/term+left*rateMonthly, 2))
 		total += monthly[i]
 	}

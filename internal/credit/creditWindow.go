@@ -67,7 +67,11 @@ func ShowCredit(a fyne.App) {
 			log.Println("credit: closed")
 		} else if keyEvent.Name == fyne.KeyReturn || keyEvent.Name == fyne.KeyEnter {
 			// Evaluate equation in case Return or Enter was pressed
+			log.Println("credit: parameters: sum =", c.Sum, ", term =", c.Term,
+				", rate =", c.Rate, ", is type annuity =", c.IsAnnuity)
 			c.Monthly.Text, c.Overpay.Text, c.Total.Text, c.Err = credit.Calculate(c.Sum, c.Term, c.Rate, c.IsAnnuity)
+			log.Println("credit: calculated: monthly =", c.Monthly.Text, ", overpay =",
+				c.Overpay.Text, ", total =", c.Total.Text)
 			if c.Err != nil {
 				// Update message label
 				c.Message.SetText("error")
