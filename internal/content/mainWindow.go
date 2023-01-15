@@ -2,6 +2,7 @@ package content
 
 import (
 	"calc/internal/about"
+	"calc/internal/credit"
 	"calc/internal/history"
 	"calc/internal/plot"
 	"fyne.io/fyne/v2"
@@ -34,7 +35,6 @@ type Calc struct {
 	IsBorderSet    IsBorderSet
 	Output         *widget.Label
 	Buttons        map[string]*widget.Button
-	Entries        map[string]*widget.Entry
 	Window         fyne.Window
 	ifEqualPressed bool
 	App            fyne.App
@@ -153,11 +153,15 @@ func (c *Calc) LoadUI(a fyne.App) {
 			if c.checkBorders() {
 				plot.ShowPlot(a, c.Equation, plot.Borders(c.Border))
 			}
+		} else if keyEvent.Name == "R" {
+			// Open credit calculator in case R was pressed
+			credit.ShowCredit(a)
 		}
 	})
 
 	// Add app menu
 	fileMenu := fyne.NewMenu("Calculator Menu",
+		fyne.NewMenuItem("Credit calculator", func() { credit.ShowCredit(a) }),
 		fyne.NewMenuItem("About", func() { about.ShowAbout(a) }),
 		fyne.NewMenuItem("Quit", func() {
 			log.Println("app: quit ...")

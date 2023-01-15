@@ -8,6 +8,7 @@ import (
 )
 
 func Calculate(sum, term, rate string, isAnnuity bool) (monthly, overpay, total string, err error) {
+	log.Println("credit: parameters: sum =", sum, ", term =", term, ", rate =", rate, ", is type annuity =", isAnnuity)
 	sumFloat, termFloat, rateFloat, err := validParameters(sum, term, rate)
 	if err != nil {
 		return
@@ -25,7 +26,7 @@ func Calculate(sum, term, rate string, isAnnuity bool) (monthly, overpay, total 
 	}
 	overpay = strconv.FormatFloat(overpayFloat, 'f', -1, 64)
 	total = strconv.FormatFloat(totalFloat, 'f', -1, 64)
-	log.Println(monthly, overpay, total)
+	log.Println("credit: calculated: monthly =", monthly, ", overpay =", overpay, ", total =", total)
 	return
 }
 
@@ -47,7 +48,6 @@ func differentiatedPayment(sum, term, rateAnnual float64) (monthly []float64, ov
 		}
 		monthly = append(monthly, roundFloat(sum/term+left*rateMonthly, 2))
 		total += monthly[i]
-		log.Println("left", roundFloat(sum-total, 2), "monthly", monthly[i])
 	}
 	total = roundFloat(total, 2)
 	overpay = roundFloat(total-sum, 2)
