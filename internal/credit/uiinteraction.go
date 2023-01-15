@@ -3,6 +3,7 @@ package credit
 import (
 	"calc/internal/math/credit"
 	"fyne.io/fyne/v2/widget"
+	"log"
 )
 
 func (c *Credit) addEntry(label string, handler func(string)) *widget.Entry {
@@ -27,9 +28,15 @@ func (c *Credit) addResultLabels() {
 func (c *Credit) addCalcButton(label string) *widget.Button {
 	button := widget.NewButton(label, func() {
 		//c.Monthly.Text, c.Overpay.Text, c.Total.Text, c.Err = credit.Calculate("50000", "12", "12", true)
+		if !c.IsAnnuitySet {
+			c.Message.SetText("error")
+			log.Println("type of payment is not set")
+			return
+		}
 		c.Monthly.Text, c.Overpay.Text, c.Total.Text, c.Err = credit.Calculate(c.Sum, c.Term, c.Rate, c.IsAnnuity)
 		if c.Err != nil {
 			c.Message.SetText("error")
+			log.Println(c.Err)
 		} else {
 			c.Message.SetText("")
 			c.Monthly.SetText(c.Monthly.Text)
@@ -46,8 +53,10 @@ func (c *Credit) addRadio() *widget.RadioGroup {
 	radio := widget.NewRadioGroup(options, func(s string) {
 		if s == "Annuity" {
 			c.IsAnnuity = true
-		} else {
+			c.IsAnnuitySet = true
+		} else if s == "Differentiated" {
 			c.IsAnnuity = false
+			c.IsAnnuitySet = true
 		}
 	})
 	radio.Horizontal = false

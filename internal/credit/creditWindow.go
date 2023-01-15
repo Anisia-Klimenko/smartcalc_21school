@@ -9,16 +9,16 @@ import (
 )
 
 type Credit struct {
-	Sum       string
-	Term      string
-	Rate      string
-	Monthly   *widget.Label
-	Overpay   *widget.Label
-	Total     *widget.Label
-	IsAnnuity bool
-	Entries   map[string]*widget.Entry
-	Err       error
-	Message   *widget.Label
+	Sum          string
+	Term         string
+	Rate         string
+	Monthly      *widget.Label
+	Overpay      *widget.Label
+	Total        *widget.Label
+	IsAnnuity    bool
+	IsAnnuitySet bool
+	Err          error
+	Message      *widget.Label
 }
 
 func ShowCredit(a fyne.App) {
@@ -30,11 +30,11 @@ func ShowCredit(a fyne.App) {
 	w4 := a.NewWindow("Credit calculator (c) acristin")
 	w4.SetContent(container.NewGridWithColumns(1,
 		container.NewGridWithColumns(4,
-			c.addLabel("Sum"),
+			c.addLabel("Total loan amount"),
 			c.addEntry("50000", func(s string) {
 				c.Sum = s
 			}),
-			c.addLabel("Monthly"),
+			c.addLabel("Monthly payment"),
 			c.Monthly,
 		),
 		container.NewGridWithColumns(4,
@@ -42,15 +42,15 @@ func ShowCredit(a fyne.App) {
 			c.addEntry("12", func(s string) {
 				c.Term = s
 			}),
-			c.addLabel("Overpay"),
+			c.addLabel("Loan overpayment"),
 			c.Overpay,
 		),
 		container.NewGridWithColumns(4,
-			c.addLabel("Rate"),
+			c.addLabel("Interest rate"),
 			c.addEntry("4.5", func(s string) {
 				c.Rate = s
 			}),
-			c.addLabel("Total"),
+			c.addLabel("Total payment"),
 			c.Total,
 		),
 		container.NewGridWithColumns(4,
